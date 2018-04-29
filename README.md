@@ -19,21 +19,23 @@ In this lab we'll use a Docker EE cluster. We'll initially deploy both a Java n-
 > * [Task 1: Configure the Docker EE Cluster](#task1)
 >   * [Task 1.1: Accessing PWD](#task1.1)
 >   * [Task 1.2: Install a Windows worker node](#task1.2)
->   * [Task 1.3: Create Three Repositories](#task1.3)
-> * [Task 2: Deploy a Java Web App](#task2)
+>   * [Task 1.3: Create Five Repositories](#task1.3)
+> * [Task 2: Deploy a Java Web App with Universal Control Plane](#task2)
 >   * [Task 2.1: Clone the Demo Repo](#task2.1)
->   * [Task 2.2: Build and Push the Web App Image](#task2.2)
->   * [Task 2.3: Deploy the Web App using UCP](#task2.3)
-> * [Task 3: Modernize Traditional Apps](#task3)
->   * [Task 3.1: Clone the repository](#task3.1)
->   * [Task 3.2: Build and Push Your Java Images to Docker Trusted Registry](#task3.2)
->   * [Task 3.3: Deploy the Java web app with Universal Control Plane](#task3.3)
-> * [Task 4: Deploy to Kubernetes](#task4)
->   * [Task 4.1: Build .NET Core app instead of .NET](#task4.1)
->   * [Task 4.2: Examine the Docker Compose File](#task4.2)
->   * [Task 4.3: Deploy to Kubernetes using the Docker Compose file](#task4.3)
->   * [Task 4.4: Verify the app](#task4.4)
-> * [Task 5: Security Scanning](#task5)
+>   * [Task 2.2: Building the Web App and Database Images](#task2.2)
+>   * [Task 2.3: Building and Pushing the Application to DTR](#task2.3)
+>   * [Task 2.4: Deploy the Web App using UCP](#task2.4)
+> * [Task 3: Modernizing with Microservices](#task3)
+>   * [Task 3.1: Building the Microservices Images](#task3.1)
+>   * [Task 3.2: Push to DTR](#task3.2)
+>   * [Task 3.3: Run the Application in UPC](#task3.3)
+> * [Task 4: Iterating on the Client](#task4)
+>   * [Task 4.1: Building the Javascript Client](#task4.1)
+>   * [Task 4.2: Deploying on a Running Cluster](#task4.2)
+> * [Task 5: Adding Logging and Monitoring](#task5)
+>   * [Task 5.1: Add Data](#task5.1)
+>   * [Task 5.2: Display Data on Kibana](#task5.2)
+> * [Task 6: Deploying on Kubernetes (#task6)]
 
 ## Understanding the Play With Docker Interface
 
@@ -500,7 +502,7 @@ You can do that right in the edit box in `UCP` but wanted to make sure you saw t
 
 9. Delete the `java_web` stack.
 
-## <a name="task3"></a>Task 3: Modernizing the Application with Microservices
+## <a name="task3"></a>Task 3: Modernizing with Microservices
 
 Now that I have stable build process, I can start migrating from a N-tier architecture to a service oriented architecture. I'll do this by picking features that can broken off into a services.
 
@@ -518,7 +520,7 @@ We’ll be adding three new components to the application - a Redis instance, th
 
 ![microservice architecture](./images/microservice_arch.jpg)
 
-## <a name="task3.1"></a>Task 3.1: Building the Microservices Containers
+## <a name="task3.1"></a>Task 3.1: Building the Microservices Images
 
 1. Build the message service that writes to Redis.
 
@@ -626,7 +628,7 @@ networks:
 
 Another benefit adding the messaging service is that it's now possible to update the client without having to rebuild the application. The original application used Java Server Pages for the client UI which is compiled along with the servlet. The message service let's me write another client in Javascript.
 
-## <a name="task4.1"></a>Task 4: Building the Javascript Client
+## <a name="task4.1"></a>Task 4.1: Building the Javascript Client
 
 
 We'll use React.js along with Bootstrap to write the new client interface. React is a popular Javascript framework that has many built in features such as the calendar widget in the form fields. In addition, Bootstrap is a well known CSS library used for responsive web pages. One advantage is that updating the client no longer needs a Java developer and can be done by a front end developer. 
@@ -660,7 +662,7 @@ CMD ["nginx", "-g", "daemon off;"]
 ```bash
    $ docker push $DTR_HOST/signup_client .
 ```
-## <a name="task4.2"></a>Task 4: Deploying on a Running Cluster
+## <a name="task4.2"></a>Task 4.2: Deploying on a Running Cluster
 
 1. One of the features of Docker Enterprise Edition is that we can add containers and functionality to a running cluster with no down time. Edit the existing stack file by copying the following
 
@@ -716,7 +718,7 @@ I’m not making changes to the application or the registration microservice, so
     depends_on:
       - elasticsearch
 ```
-
+### <a name="task5.1">Task 5.1: Add Data
 It won’t replace running containers if their definition matches the service in the Docker Compose file. Since the worker service has been updated docker-compose up -d will run the containers for the Elasticsearch, Kibana and the message handler. It will leave the other containers running as is,letting me add new features without taking the application offline.
 
 To run the example:
@@ -724,10 +726,13 @@ To run the example:
 $ docker-compose up -d
 ```
 
+
 To make the example more visually interesting, I added code to calculate the age of the person based on their birthday and write that to Elasticsearch. To test it out, I wrote a small shell script that posts the user data to the service to populate the database.
 ```
 $ ./firefly_data.sh
 ```
+
+### <a name=task5.2>Task 5.2: Display Data on Kibana
 Now, I can use Kibana to index the data and look at the data.
 
 ![data](./images/kibana6.png)
