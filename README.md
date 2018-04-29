@@ -718,7 +718,7 @@ I’m not making changes to the application or the registration microservice, so
     depends_on:
       - elasticsearch
 ```
-### <a name="task5.1">Task 5.1: Add Data
+### <a name="task5.1"></a>Task 5.1: Add Data
 It won’t replace running containers if their definition matches the service in the Docker Compose file. Since the worker service has been updated docker-compose up -d will run the containers for the Elasticsearch, Kibana and the message handler. It will leave the other containers running as is,letting me add new features without taking the application offline.
 
 To run the example:
@@ -732,7 +732,7 @@ To make the example more visually interesting, I added code to calculate the age
 $ ./firefly_data.sh
 ```
 
-### <a name=task5.2>Task 5.2: Display Data on Kibana
+### <a name=task5.2></a>Task 5.2: Display Data on Kibana
 Now, I can use Kibana to index the data and look at the data.
 
 ![data](./images/kibana6.png)
@@ -744,11 +744,73 @@ I can then make a chart of the character's ages using a Kibana visualization.
 
 ## <a name="task6"></a>Task 6: Deploying in Kubernetes
 
-Docker EE gives you the choice of which orchestrator that you want to choose.
+Docker EE gives you the choice of which orchestrator that you want to choose. The same application that you deployed in Docker Swarm can be deployed in Kubernetes using a Docker Compose file or with Kubernetes manifests.
+
+### <a name="task6.1></a>Task 6.1: Delete the Stack
+
+Delete the application stack you deployed in Docker Swarm
+
+![](example images deleting stack)
+
+### <a name="task6.1></a>Task 6.1: Deploy Application in Kubernetes with a Compose File
+
+Deploy the application in Kubernetes using a Docker Compose file. 
+
+![](example images of deploying to Kubernetes)
+
+Copy the Compose file below to deploy the application.
+
+```yaml
+# Compose file modified to deploy using Kubernets
+```
+
+###  <a name="task6.2></a>Task 6.2: Check out the Deployment on the Command Line
+
+1. Go to the terminal window.
+
+2. View all info on deployment:
+
+```bash
+$ kubectl get all
+```
+
+3. View info on pods
+
+```bash
+$ kubectl get pods
+```
+
+4. View info on loadbalancers
+
+```bash
+$ kubectl get lbs
+```
+
+... yatta yatta yatta
 
 
+###  <a name="task6.3></a>Task 6.3: Check out the Deployment using UCP
 
+1. View pods
 
+2. View services
 
+3. View loadbalancers
 
+...  yatta yatta yatta
 
+## Conclusion
+
+### What we covered
+
+### Modernization Workflow
+
+### Agility
+
+### Choice
+
+## Call to Action
+
+### Download Docker EE
+### MTA
+### Docker Associate Certification
