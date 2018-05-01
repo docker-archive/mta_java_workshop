@@ -53,7 +53,7 @@ Play with Docker provides access to the 3 Docker EE hosts in your Cluster. These
 * A Linux-based Docker EE 18.01 Manager node
 * Three Linux-based Docker EE 18.01 Worker nodes
 
-> **Important Note: beta** Please note, as of now this is a Docker EE 2.0 environment. Docker EE 2.0 shows off the new Kubernetes functionality which is described below.
+> **Important Note: beta** Please note, as of now, this is a Docker EE 2.0 environment. Docker EE 2.0 shows off the new Kubernetes functionality which is described below.
 
 By clicking a name on the left, the console window will be connected to that node.
 
@@ -78,9 +78,9 @@ Docker EE provides an integrated, tested and certified platform for apps running
 
 ### <a name="intro2"></a>Overview of Orchestration
 
-While it is easy to run an application in isolation on a single machine, orchestration allows you to coordinate multiple machines to manage an application, with features like replication, encryption, loadbalancing, service discovery and more. If you've read anything about Docker, you have probably heard of Kubernetes and Docker swarm mode. Docker EE allows you to use either Docker swarm mode or Kubernetes for orchestration. 
+While it is easy to run an application in isolation on a single machine, orchestration allows you to coordinate multiple machines to manage an application, with features like replication, encryption, loadbalancing, service discovery and more. If you've read anything about Docker, you have probably heard of Kubernetes and Docker swarm mode. Docker EE allows you to use either Docker Swarm mode or Kubernetes for orchestration. 
 
-Both Docker swarm mode and Kubernetes are declarative: you declare your cluster's desired state, and applications you want to run and where, networks, and resources they can use. Docker EE simplifies this by taking common concepts and moving them to the a shared resource.
+Both Docker Swarm mode and Kubernetes are declarative: you declare your cluster's desired state, and applications you want to run and where, networks, and resources they can use. Docker EE simplifies this by taking common concepts and moving them to the a shared resource.
 
 #### <a name="intro2.1"></a>Overview of Docker Swarm mode
 
@@ -94,7 +94,7 @@ Kubernetes is available in Docker EE 2.0 and included in this workshop. Kubernet
 
 ## <a name="task1"></a>Task 1: Configure the Docker EE Cluster
 
-The Play with Docker (PWD) environment is almost completely set up, but before we can begin the labs, we need to do two more steps. First we'll create two repositories in Docker Trusted Registry.
+The Play with Docker (PWD) environment is almost completely set up, but before we can begin the labs, we need to do two more steps. First we'll create repositories in Docker Trusted Registry.
 
 ### <a name="task 1.1"></a>Task 1.1: Accessing PWD
 
@@ -179,7 +179,7 @@ However, before we create the repositories, we do want to restrict access to the
 
 	![](./images/add_repository_database.png)
 
-13. Repeat 4-11 above to create a `backend` organization with repositories called `database`, `messageservice` and `worker`. Create a team named `services` (with `backend_user` as a member). Grant `read/write` permissions for the `database`,`messageservice` and `worker` repositories to the `services` team.
+13. Repeat steps 4-11 above to create a `backend` organization with repositories called `database`, `messageservice` and `worker`. Create a team named `services` (with `backend_user` as a member). Grant `read/write` permissions for the `database`,`messageservice` and `worker` repositories to the `services` team.
 
 14. From the main DTR page, click Repositories, you will now see all three repositories listed.
 	
@@ -192,11 +192,11 @@ However, before we create the repositories, we do want to restrict access to the
 Congratulations, you have created five new repositories in two new organizations, each with one team and a user each.
 
 ## <a name="task2"></a>Task 2: Deploy a Java Web App with Universal Control Plane
-Now that we've completely configured our cluster, let's deploy a couple of web apps. The first app is a basic Java CRUD (Create Read Update Delete) application in Tomcat that writes to a MySQL database.
+Now that we've completely configured our cluster, let's deploy a couple of web apps. The first app is a basic Java CRUD (Create Read Update Delete) application in Tomcat that writes to a MySQL database. 
 
-### <a name="task2.1"></a> Task 2.1: Clone the Demo Repo
+### <a name="task2.1"></a> Task 2.1: Clone the Repository
 
-1. From PWD click on the `worker1` link on the left to connnect your web console to the UCP Linux worker node.
+1. From PWD click on the `worker1` link on the left to connect your web console to the UCP Linux worker node.
 
 2. Before we do anything, let's configure an environment variable for the DTR URL/DTR hostname. You may remember that the session information from the Play with Docker landing page. Select and copy the the URL for the DTR hostname.
 
@@ -227,15 +227,15 @@ Now that we've completely configured our cluster, let's deploy a couple of web a
 	Checking connectivity... done.
 	```
 
-	You now have the necessary demo code on your worker host.
+	You now have the necessary code on your worker host.
 
 ### <a name="task2.2"></a> Task 2.2: Building the Web App and Database Images
 
-As a first step, containerizing the application without changing existing code let's us test the concept of migrating the application to a container architecture. I'll do this by building the application from the source code and deploying it in an application server.  The code for containerizing the application can be found in the [part_2](./part_2) directory. Additionally, I'll configure and deploy the database.
+As a first step, we'll containerize the application without changing existing code to test the concept of migrating the application to a container architecture. We'll do this by building the application from the source code and deploying it in the same application server used in production.  The code for containerizing the application can be found in the [part_2](./part_2) directory. Additionally, I'll configure and deploy the database.
 
-Docker makes this possible with a Dockerfile, which is a text document that contains all the commands a user could call on the command line to assemble an image. Using docker build users can create an automated build that executes several command-line instructions in succession.
+Docker simplifies containerization with a Dockerfile, which is a text document that contains all the commands a user could call on the command line to assemble an image. Using `docker image build` users can create an automated build that executes several command-line instructions in succession.
 
-Within a Dockerfile, I'll perform a multi-stage where the code will be compiled and packaged using a container running maven.  All dependencies and jar files are downloaded to the maven container based on the pom.xml file. The toolchain to build the application is completely in the maven container and not local to your development environment. All builds will be exactly the same regardless of the development environment.
+With a Dockerfile, we'll perform a multi-stage where the code will be compiled and packaged using a container running maven.  All dependencies and jar files are downloaded to the maven container based on the pom.xml file. The tool chain to build the application is completely in the maven container and not local to your development environment. The output of this step is a Web Archive or WAR file that's ready for deployment in an application server. All builds will be exactly the same regardless of the development environment.
 
 ```
 FROM maven:latest AS devenv
@@ -287,19 +287,19 @@ ENV MYSQL_PASSWORD=password
 
 ### <a name="task2.3"></a> Task 2.3: Building and Pushing the Application to DTR
 
-1. Change into the `java-app` directory.
+1. Change into the `java_app` directory.
 
 	```bash
-	$ cd ./part_2/appserver/
+	$ cd ./part_2/java_app/
 	```
 
 2. Use `docker build` to build your Docker image.
 
-	```Bash
+	```bash
 	$ docker build -t $DTR_HOST/frontend/java_web .
 	```
 
-	The `-t` tags the image with a name. In our case, the name indicates which DTR server and under which organization's respository the image will live.
+	The `-t` tags the image with a name. In our case, the name indicates which DTR server and under which organization's repository the image will live.
 
 	> **Note**: Feel free to examine the Dockerfile in this directory if you'd like to see how the image is being built.
 
@@ -307,7 +307,7 @@ ENV MYSQL_PASSWORD=password
 
 3. Log into your DTR server from the command line.
  
-	First use the `backend_user`, which isn't part of the java organization
+	First use the `backend_user`, which isn't part of the frontend organization
 
 	```bash
 	$ docker login $DTR_HOST
@@ -356,7 +356,7 @@ ENV MYSQL_PASSWORD=password
 
 	Success! Because you are using a user name that belongs to the right team in the right organization, you can push your image to DTR.
 
-5. In your web browser head back to your DTR server and click `View Details` next to your `java_web` repo to see the details of the repo.
+5. In your web browser head back to your DTR server and click `View Details` next to your `java_web` repository to see the details.
 
 	> **Note**: If you've closed the tab with your DTR server, just click the `DTR` button from the PWD page.
 
@@ -387,11 +387,12 @@ ENV MYSQL_PASSWORD=password
 images
 
 
+
 ### <a name="task2.4"></a> Task 2.4: Deploy the Web App using UCP
 
-Docker lets me automate the process of building and running the application using a single file using Docker Compse. Compose is a tool for defining and running multi-container Docker applications. With Compose, you use a YAML file to configure your application’s services. Then, with a single command, you create and start all the services from your configuration.
+Docker automates the process of building and running the application from a single file using Docker Compse. Compose is a tool for declaratively  defining and running multi-container Docker applications. With Compose, a YAML file configures the application’s services. Then, with a single command, all the services are configured, created and started.
 
-I'll go through the Compose [file](./part_2/docker-compose.yml) 
+We'll go through the Compose [file](./part_2/docker-compose.yml) 
 
 ```yaml
     version: "3.3"
@@ -410,7 +411,7 @@ I'll go through the Compose [file](./part_2/docker-compose.yml)
           - back-tier
 ```
 
-In the section above, I build the database container based on the Dockerfile in the `./database` directory which is also the Docker context or root directory for building the image. I can pass environmental variables such as the password and the port. I also name the image using the `image:` directive. 
+In the section above, We pull the database container from DTR. We can also pass environmental variables such as the password and the port, and name the image using the `image:` directive.
 
 ```yaml
       webserver:
@@ -422,7 +423,7 @@ In the section above, I build the database container based on the Dockerfile in 
           - back-tier
 ```
 
-In this section, I build the application in the `./appserver` directory and name the image `registration`. As in the database, I set the external ports.
+In this section, the java_web application is pulled from DTR and named the service is named `webserver`. As in the database, the external port is set.
 
 ```yaml
     networks:
@@ -430,7 +431,7 @@ In this section, I build the application in the `./appserver` directory and name
       front-tier:
 ```
 
-In this section, I've defined two networks, the back-tier network isolates backend components from components on the front-tier network. This seems unnecessary in this current configuration but I'll make use of the networks in later iterations.
+In this section, two networks are defined, the back-tier network isolates backend components from components on the front-tier network. This seems unnecessary in this current configuration but we'll make use of the networks in later iterations.
 
 The next step is to run the app in Swarm. As a reminder, the application has two components, the web front-end and the database. In order to connect to the database, the application needs a password. If you were just running this in development you could easily pass the password around as a text file or an environment variable. But in production you would never do that. So instead, we're going to create an encrypted secret. That way access can be strictly controlled.
 
@@ -440,7 +441,7 @@ The next step is to run the app in Swarm. As a reminder, the application has two
 
 	![](./images/ucp_secret_menu.png)
 
-3. You'll see a `Create Secret` screen. Type `mysql_password` in `Name` and `Dockercon!!!` in `Content`. Then click `Create` in the lower left. Obviously you wouldn't use this password in a real production environment. You'll see the content box allows for quite a bit of content, you can actually create structured content here that will be encrypted with the secret.
+3. You'll see a `Create Secret` screen. Type `mysql_root_password` in `Name` and `Dockercon!!!` in `Content`. Then click `Create` in the lower left. Obviously you wouldn't use this password in a real production environment. You'll see the content box allows for quite a bit of content, you can actually create structured content here that will be encrypted with the secret.
 
 	![](./images/secret_add_config.png)
 
@@ -452,9 +453,9 @@ The next step is to run the app in Swarm. As a reminder, the application has two
 
 6. Now we're going to use the fast way to create your application: `Stacks`. In the left panel, click `Shared Resources`, `Stacks` and then `Create Stack` in the upper right corner.
 
-7. Name your stack `java_web` and select `Swarm Services` for your `Mode`. Below you'll see we've included a `.yml` file. Before you paste that in to the `Compose.yml` edit box, note that you'll need to make a quick change. Each of the images is defined as `<dtr hostname>/frontend/<something>`. You'll need to change the `<dtr hostname>` to the DTR Hostname found on the Play with Docker landing page for your session. It will look something like this:
+7. Name your stack `java_web` and select `Swarm Services` for your `Mode`. Below is a `.yml` file. Before you paste that in to the `Compose.yml` edit box, note that you'll need to make a quick change. Each of the images is defined as `<dtr hostname>/frontend/<something>`. You'll need to change the `<dtr hostname>` to the DTR Hostname found on the Play with Docker landing page for your session. It will look something like this:
 `ip172-18-0-21-baeqqie02b4g00c9skk0.direct.ee-beta2.play-with-docker.com`
-You can do that right in the edit box in `UCP` but wanted to make sure you saw that first.
+You can do that right in the edit box in `UCP` but make sure you saw that first.
 
 	![](./images/ucp_create_stack.png)
 
@@ -469,12 +470,14 @@ You can do that right in the edit box in `UCP` but wanted to make sure you saw t
         image: <$DTR_HOST>/java/database
         # set default mysql root password, change as needed
         environment:
-          MYSQL_ROOT_PASSWORD: mysql_password
+          MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
         # Expose port 3306 to host. 
         ports:
           - "3306:3306" 
         networks:
-          - back-tier
+		  - back-tier
+		secrets:
+		  
 
       webserver:
         image: <$DTR_HOST>/java/java_web:
@@ -490,11 +493,11 @@ You can do that right in the edit box in `UCP` but wanted to make sure you saw t
         external: true 
 
     secrets:
-      mysql_password:
+      mysql_root_password:
         external: true
     ```
 
-	Then click `Done` in the lower right.
+Then click `Done` in the lower right.
 
 8. Click on `Stacks` again, and select the `java_web` stack. Click on `Inspect Resources` and then select `Services`. Select `java_web_webserver`. In the right panel, you'll see `Published Endpoints`. Select the one with `:8080` at the end. You'll see a `Apache Tomcat/7.0.84` landing page. Add `/java-web` to the end of the URL and you'll see the app.
 
@@ -504,19 +507,19 @@ You can do that right in the edit box in `UCP` but wanted to make sure you saw t
 
 ## <a name="task3"></a>Task 3: Modernizing with Microservices
 
-Now that I have stable build process, I can start migrating from a N-tier architecture to a service oriented architecture. I'll do this by picking features that can broken off into a services.
+Now that we have stable build process, we can start migrating from a N-tier architecture to a service oriented architecture. We'll do this piece wise by picking features that can be easily broken off into a services.
 
-One of the problems associated with Java CRUD applications is that database operations can be expensive in terms of fetching and reading data from I/O and memory. Lots of users trying to write to a synchronous database can cause a bottleneck. One pattern to to make the application more efficient is to use a message queue. I can publish an event from the Web app to a message queue and move the data-persistence code into a new component that handles that event message. If I have a spike of traffic to the Web site I can run more containers on more hosts to cope with the incoming requests. Event messages will be held in the queue until the message handler consumes them.
+One of the problems associated with Java CRUD applications is that database operations can be expensive in terms of fetching and reading data from I/O and memory. Applications that frequently write to a synchronous database can cause a bottleneck. One way to make the application more efficient is to use a message queue. We can publish an event from the Web app to a message queue and move the data-persistence code into a new component that handles that event message. If there is a spike of traffic to the web site, we can add more containers on more nodes to cope with the incoming requests. Event messages will be held in the queue until the message handler consumes them.
 
- The message queue is implemented by adding a RESTful microservice that writes the user data to a Redis database that stores the information. If you’re not familiar with Redis, tt’s an in memory key-value store that’s great for saving abstract data types such as JSON lists. Note that I could use any other key-value datastore in place of Redis, such as memcached or MongoDB.
+ The message queue is implemented by adding a RESTful microservice that writes the user data to a Redis database that stores the information. If you’re not familiar with Redis, it’s an in memory key-value store that’s great for saving abstract data types such as JSON lists. Note that we could use any other key-value datastore in place of Redis, such as memcached or MongoDB.
 
-The [messageservice](./part_3/messageservice) uses the Spring Boot framework.  Spring Boot was chosen because it has many advantages such as handling the database connections transparently, implementing both a MVC architecture and RESTful interfaces is simple, and includes a built-in application server in the form of Tomcat. Another factor in choosing Spring Boot is that it has good support for Redis.  We could continue to use Spring as in the original application, but all of these advantages simplifies configuration and deployment.
+The [messageservice](./part_3/messageservice) uses the Spring Boot framework. Spring Boot was chosen because it has many advantages such as handling the database connections transparently, implementing both a MVC architecture and RESTful interfaces is simplified, and it includes a built-in application server in the form of Tomcat. Another factor in choosing Spring Boot is that it has good support for Redis.  We could continue to use Spring as in the original application, but all of these advantages simplifies configuration and deployment.
 
 The message service is an MVC application that uses the same User entity model in the original application. It consists of a repository for interacting with  Redis, a service that handles the connection and transport, and a controller for the REST endpoint.
 
-The next piece is a [worker microservice](./part_3/worker) that retrieves the user data stored in Redis and writes the data to the application’s MySQL database. The worker is a Plain Old Java Object or POJO that pulls the data from Redis using the blpop method. This method allows the worker to to pop data from the queue without constantly checking the status of the queue. Blpop works like a one time trigger that fires when data gets placed in the queue. Setting up the communication between the application and the worker establishes a reliable and fast queuing system.
+The next piece is a [worker microservice](./part_3/worker) that retrieves the user data stored in Redis and writes the data to the MySQL database. The worker is a Plain Old Java Object, or POJO, that pulls the data from Redis using the blpop method. This method allows the worker to to pop data from the queue without constantly checking the status of the queue. Blpop works like a one time trigger that fires when data gets placed in the queue. Setting up the communication between the application and the worker establishes a reliable and fast queuing system.
 
-We’ll be adding three new components to the application - a Redis instance, the messageservice and the worker that writes to the database. There are Dockerfiles for both the [messageservice](./part_3/messageservice/Dockerfile) and the [worker](./part_3/worker/Dockerfile) to build them as images. Since Spring Boot includes Tomcat and the worker is just a jar file, I can build and deploy both components in a Java container.
+We're adding three new components to the application - a Redis instance, the messageservice and the worker that writes to the database. There are Dockerfiles for both the [messageservice](./part_3/messageservice/Dockerfile) and the [worker](./part_3/worker/Dockerfile) to build them as images. Since Spring Boot includes Tomcat and the worker is just a jar file, we can build and deploy both components in a Java container.
 
 ![microservice architecture](./images/microservice_arch.jpg)
 
@@ -536,11 +539,12 @@ $ cd ../part_3/worker
 $ docker image build $DTR_HOST/backend/messageservice .
 ```
 
-3. One last thing, I'll need to modify the code in the original application to send the user data from the form to messageservice instead of writing it to the database directly. The main change in the code is that the data is posted to the messageservice instead of MySQL. Note the URL, it uses the name of the messageservice defined in the Compose file.
-Build the Java appserver.
+3. One last thing, we'll need to modify the code in the original application to send the user data from the form to messageservice instead of writing it to the database directly. The main change in the code is that the data is posted to the messageservice instead of MySQL.
+
+Build the Java application and tag it with version 2.
 
 ```bash
-$ cd ./part3/appserver
+$ cd ./part3/java_app
 $ docker image build -t $DTR_HOST/backend/java_web:2 .
 ```
 
@@ -571,7 +575,7 @@ $ docker image build -t $DTR_HOST/backend/java_web:2 .
 
 ## <a name="task3.3"></a>Task 3.3: Run the Application in UPC
 
-Adding all these new elements adds complexity to deployment and maintenance when compared to a monolithic application comprised of only a application server and a database. But we’ll use Docker to easily deploy, manage and maintain all these additional services. One component that's not in DTR is Redis, a Dockerfile is not needed because we'll use official Redis image without any additional configuration.
+Adding microservices adds complexity to deployment and maintenance when compared to a monolithic application comprised of only a application server and a database. But we’ll use Docker to easily deploy, manage and maintain these additional services. One component that's not in DTR is Redis, a Dockerfile is not needed because we'll use official Redis image without any additional configuration.
 
 To run the application, create a new stack using this compose file:
 
@@ -583,11 +587,13 @@ services:
   database:
     image: <$DTR_HOST>/backend/database
     environment:
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
     ports:
-      - "3306:3306" 
+      - "3306:3306"
     networks:
-      - back-tier
+	  - back-tier
+	secrets:
+	  - mysql_root_password
 
   webserver:
     image: <$DTR_HOST>/backend/java_web:2
@@ -603,12 +609,12 @@ services:
     image: <$DTR_HOST>/backend/messageservice
     ports:
       - "8090:8090"
-    networks: 
+    networks:
       - back-tier
 
   worker:
     image: <$DTR_HOST>/backend/worker
-    networks: 
+    networks:
       - back-tier
 
   redis:
@@ -622,16 +628,19 @@ services:
 networks:
   front-tier:
   back-tier:
+
+secrets:
+  mysql_root_password:
+    external: true
 ```
 
 ## <a name="task4"></a>Task 4: Iterating on the Client
 
-Another benefit adding the messaging service is that it's now possible to update the client without having to rebuild the application. The original application used Java Server Pages for the client UI which is compiled along with the servlet. The message service let's me write another client in Javascript.
+Another benefit adding the messaging service is that it's now possible to update the client without having to rebuild the application. The original application used Java Server Pages for the client UI which is compiled along with the servlet. The message service let's us write another client in Javascript that's not dependent on the Java application.
 
 ## <a name="task4.1"></a>Task 4.1: Building the Javascript Client
 
-
-We'll use React.js along with Bootstrap to write the new client interface. React is a popular Javascript framework that has many built in features such as the calendar widget in the form fields. In addition, Bootstrap is a well known CSS library used for responsive web pages. One advantage is that updating the client no longer needs a Java developer and can be done by a front end developer. 
+We'll use React.js along with Bootstrap to write the new client interface. React is a popular Javascript framework that has many built in features such as the calendar widget in the form fields. In addition, Bootstrap is a well known CSS library used for responsive web pages. One advantage is that updating the client no longer needs a Java developer and can be done by a front end developer.
 
 The client uses a Node.js container to build the javascript client and deployed it is to Nginx using a multi-stage build.
 
@@ -721,13 +730,7 @@ I’m not making changes to the application or the registration microservice, so
 ### <a name="task5.1"></a>Task 5.1: Add Data
 It won’t replace running containers if their definition matches the service in the Docker Compose file. Since the worker service has been updated docker-compose up -d will run the containers for the Elasticsearch, Kibana and the message handler. It will leave the other containers running as is,letting me add new features without taking the application offline.
 
-To run the example:
-```
-$ docker-compose up -d
-```
-
-
-To make the example more visually interesting, I added code to calculate the age of the person based on their birthday and write that to Elasticsearch. To test it out, I wrote a small shell script that posts the user data to the service to populate the database.
+To make the example more visually interesting, code to calculate the age of the person based on their birthday was added to to the worker microservice. To test it out, there is a small shell script that posts the user data to the service to populate the database.
 ```
 $ ./firefly_data.sh
 ```
