@@ -72,6 +72,6 @@
     </dependency>
   </dependencies>
   <build>
-    <finalName>Signup</finalName>
+    <finalName>java-web</finalName>
   </build>
 </project>
