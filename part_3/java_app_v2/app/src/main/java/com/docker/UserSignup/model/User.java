@@ -14,7 +14,6 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.docker.UserSignup.util.Rot13;
 
 @Entity
 @Table(name="user")

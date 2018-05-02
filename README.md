@@ -462,39 +462,38 @@ You can do that right in the edit box in `UCP` but make sure you saw that first.
 	Here's the `Compose` file. Once you've copy and pasted it in, and made the changes, click `Create` in the lower right corner.
 
     ```yaml
-    version: "3.3"
+version: "3.3"
 
-    services:
+services:
 
-      database:
-        image: <$DTR_HOST>/java/database
-        # set default mysql root password, change as needed
-        environment:
-          MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
-        # Expose port 3306 to host. 
-        ports:
-          - "3306:3306" 
-        networks:
-		  - back-tier
-		secrets:
-		  
-
-      webserver:
-        image: <$DTR_HOST>/java/java_web:
-        ports:
-          - "8080:8080" 
-        networks:
-          - front-tier
-          - back-tier
-
+  database:
+    image: ip172-18-0-16-bbku38q3o28g00d9jqk0.direct.beta-hybrid.play-with-docker.com/backend/database
+    # set default mysql root password, change as needed
+    environment:
+      MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
+    # Expose port 3306 to host. 
+    ports:
+      - "3306:3306" 
     networks:
-      back-tier:
-      front-tier:
-        external: true 
-
+      - back-tier
     secrets:
-      mysql_root_password:
-        external: true
+      - mysql_root_password
+
+  webserver:
+    image: ip172-18-0-16-bbku38q3o28g00d9jqk0.direct.beta-hybrid.play-with-docker.com/frontend/java_web:1
+    ports:
+      - "8080:8080" 
+    networks:
+      - front-tier
+      - back-tier
+
+networks:
+  back-tier:
+  front-tier:
+
+secrets:
+  mysql_root_password:
+    external: true
     ```
 
 Then click `Done` in the lower right.

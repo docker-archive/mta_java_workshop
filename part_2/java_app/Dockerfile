@@ -27,12 +27,7 @@ ADD tomcat/mysql-connector-java-5.1.36-bin.jar $CATALINA_HOME/lib/
 
 # create mount point for volume with application
 WORKDIR $CATALINA_HOME/webapps/
-COPY --from=devenv /usr/src/signup/target/Signup.war .
-
-# add tomcat jpda debugging environmental variables
-#ENV JPDA_OPTS="-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n"
-ENV JPDA_ADDRESS="8000"
-ENV JPDA_TRANSPORT="dt_socket"
+COPY --from=devenv /usr/src/signup/target/java-web.war .
 
 # start tomcat7 with remote debugging
 EXPOSE 8080

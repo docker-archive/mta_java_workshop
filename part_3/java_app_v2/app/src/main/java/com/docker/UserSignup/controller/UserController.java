@@ -35,6 +35,8 @@ public class UserController {
 	
 	@Autowired
 	private UserService userService;
+
+	String baseUri = System.getenv("BASEURI");
 		
 	@RequestMapping(value="/signup", method=RequestMethod.GET)
 	public String signup(Model model) {
@@ -51,7 +53,7 @@ public class UserController {
 			model.addAttribute("message", "User Name exists. Try another user name");
 			return "signup";
 		} else {
-			String uri = new String("http://messageservice:8090/user");
+			String uri = baseURI;
 			RestTemplate rt = new RestTemplate();
 			Long id = new Long(new Random().nextInt(10000)+10000);
 			user.setId(id);
