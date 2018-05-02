@@ -53,7 +53,7 @@ public class UserController {
 			model.addAttribute("message", "User Name exists. Try another user name");
 			return "signup";
 		} else {
-			String uri = baseURI;
+			String uri = baseUri;
 			RestTemplate rt = new RestTemplate();
 			Long id = new Long(new Random().nextInt(10000)+10000);
 			user.setId(id);
