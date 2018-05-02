@@ -752,7 +752,7 @@ Docker EE gives you the choice of which orchestrator that you want to choose. Th
 ### <a name="task6.1></a>Task 6.1: Delete the Stack
 
 Delete the application stack you deployed in Docker Swarm
-
+	
 ![](example images deleting stack)
 
 ### <a name="task6.1></a>Task 6.1: Deploy Application in Kubernetes with a Compose File

@@ -14,8 +14,6 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.docker.UserSignup.util.Rot13;
-
 @Entity
 @Table(name="user")
 public class User {
@@ -84,7 +82,7 @@ public class User {
 	}
 
 	public void setPassword(String password) {
-		this.password = Rot13.rot13(password);
+		this.password = password;
 	}
 
 	public String getEmailAddress() {
