@@ -10,4 +10,4 @@ ENV MYSQL_DATABASE=signup
 ENV MYSQL_USER=gordon
 ENV MYSQL_PASSWORD=password
 
-ENTRYPOINT [ "mysql","--default-auth=mysql_native_password" ]
+CMD ["--default-auth=mysql_native_password"]
