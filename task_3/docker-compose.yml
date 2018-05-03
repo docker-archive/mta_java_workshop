@@ -5,7 +5,7 @@ services:
   database:
     build:
       context: ./database
-    image: registrationdb
+    image: database
     # set default mysql root password, change as needed
     environment:
       MYSQL_ROOT_PASSWORD: password
@@ -20,6 +20,8 @@ services:
     build: 
       context: ./appserver
     image: registration
+    environment:
+      BASEURI: http://messageservice/user
     ports:
       - "8080:8080" 
       - "8000:8000"
