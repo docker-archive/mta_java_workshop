@@ -467,7 +467,7 @@ version: "3.3"
 services:
 
   database:
-    image: ip172-18-0-16-bbku38q3o28g00d9jqk0.direct.beta-hybrid.play-with-docker.com/backend/database
+    image: <$DTR_HOST>/backend/database
     # set default mysql root password, change as needed
     environment:
       MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
@@ -480,7 +480,7 @@ services:
       - mysql_root_password
 
   webserver:
-    image: ip172-18-0-16-bbku38q3o28g00d9jqk0.direct.beta-hybrid.play-with-docker.com/frontend/java_web:1
+    image: <$DTR_HOST>/frontend/java_web:1
     ports:
       - "8080:8080" 
     networks:
