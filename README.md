@@ -131,7 +131,7 @@ However, before we create the repositories, we do want to restrict access to the
 
 3. Create a new user, `frontend_user` and give it a password you'll remember. I used `user1234`. Be sure to save the user.
 
-	![](/images/create_java_user.png)
+	![](/images/create_frontend_user.png)
 
 	Then do the same for a `backend_user`.
 
@@ -141,7 +141,7 @@ However, before we create the repositories, we do want to restrict access to the
 
 5. Press New organization button, name it `frontend`, and click save.
 
-	![](./images/java_organization_new.png)
+	![](./images/frontend_organization_new.png)
 
 	Then do the same with `backend` and you'll have two organizations.
 
@@ -149,7 +149,7 @@ However, before we create the repositories, we do want to restrict access to the
 
 6. Now you get to add a repository! Click on the `frontend` organization, select repositories and then Add repository
 
-	![](./images/add_repository_java.png)
+	![](./images/add_repository_frontend.png)
 
 7. Name the repository `java_web`.
 
@@ -159,7 +159,7 @@ However, before we create the repositories, we do want to restrict access to the
 
 8. Now it's time to create a team so you can restrict access to who administers the images. Select the `frontend` organization and the members will show up. Press Add user and start typing in frontend. Select the `frontend_user` when it comes up.
 
-	![](./images/add_java_user_to_organization.png)
+	![](./images/add_frontend_user_to_organziation.png)
 
 9. Next select the `frontend` organization and press the `Team` button to create a `web` team.
 
@@ -177,13 +177,13 @@ However, before we create the repositories, we do want to restrict access to the
 
 12. Now add a new repository also owned by the web team and call it `signup_client`. This can be done directly from the web team's `Repositories` tab by selecting the radio button for Add `New` Repository. Be sure to grant `Read/Write` permissions for this repository to the `web` team as well.
 
-	![](./images/add_repository_database.png)
+	![](./images/add_repository_signup_client.png)
 
 13. Repeat steps 4-11 above to create a `backend` organization with repositories called `database`, `messageservice` and `worker`. Create a team named `services` (with `backend_user` as a member). Grant `read/write` permissions for the `database`,`messageservice` and `worker` repositories to the `services` team.
 
 14. From the main DTR page, click Repositories, you will now see all three repositories listed.
 	
-	![](./images/three_repositories.png)
+	![](./images/five_repositories.png)
 
 15. (optional) If you want to check out security scanning in Task 5, you should turn on scanning now so DTR downloads the database of security vulnerabilities. In the left-hand panel, select `System` and then the `Security` tab. Select `ENABLE SCANNING` and `Online`.
 
@@ -461,7 +461,7 @@ You can do that right in the edit box in `UCP` but make sure you saw that first.
 
 	Here's the `Compose` file. Once you've copy and pasted it in, and made the changes, click `Create` in the lower right corner.
 
-    ```yaml
+```yaml
 version: "3.3"
 
 services:
@@ -494,7 +494,7 @@ networks:
 secrets:
   mysql_root_password:
     external: true
-    ```
+```
 
 Then click `Done` in the lower right.
 
