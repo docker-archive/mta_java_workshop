@@ -4,7 +4,7 @@ import logo from './logo.svg';
 import './App.css';
 import './bootstrap-united.css';
 
-const messageservice_uri = process.env.REACT_APP_MESSAGESERVICE_URI;
+let messageservice_uri = process.env.REACT_APP_MESSAGESERVICE_URI;
 
 class App extends Component {
 
@@ -33,19 +33,17 @@ class App extends Component {
     console.log("mesage service url= " + messageservice_uri);
     e.preventDefault();
     const { id, userName, password, firstName, lastName, dateOfBirth, emailAddress} = this.state;
-    // http://messageservice:8090/user
-    axios.post("http://messageservice:8090/user", { id, userName, password, firstName, lastName, dateOfBirth, emailAddress })
-      // .then((result) => {
-        //access the results here....
-        .then(function (response) {
-          console.log(response);
-        })
-        .catch(function (error) {
-          console.log(error);  
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-      });
+    console.log({ id, userName, password, firstName, lastName, dateOfBirth, emailAddress});
+    axios.post("http://localhost:8090/user", { id, userName, password, firstName, lastName, dateOfBirth, emailAddress })
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);  
+      console.log(error.response.data);
+      console.log(error.response.status);
+       console.log(error.response.headers);
+    });
   }
 
 
