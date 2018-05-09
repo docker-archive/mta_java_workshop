@@ -34,7 +34,7 @@ class App extends Component {
     e.preventDefault();
     const { id, userName, password, firstName, lastName, dateOfBirth, emailAddress} = this.state;
     console.log({ id, userName, password, firstName, lastName, dateOfBirth, emailAddress});
-    axios.post("http://localhost:8090/user", { id, userName, password, firstName, lastName, dateOfBirth, emailAddress })
+    axios.post("http://messageservice:8090/user", { id, userName, password, firstName, lastName, dateOfBirth, emailAddress })
     .then(function (response) {
       console.log(response);
     })

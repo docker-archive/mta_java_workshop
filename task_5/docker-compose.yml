@@ -14,21 +14,21 @@ services:
       - mysql_root_password
 
   webserver:
-    image: <$DTR_HOST>/backend/java_web:2
+    image: <$DTR_HOST>/frontend/java_web:2
     ports:
       - "8080:8080"
     environment:
-      BASEURI: http://messageservice:8090/users
+      BASEURI: http://messageservice:8090/user
     networks:
       - front-tier
       - back-tier
 
   signup_client:
-    image:  <$DTR_HOST>/signup_client
+    image:  <$DTR_HOST>/frontend/signup_client
     ports:
       - "8000:80"
     environment:
-      REACT_APP_MESSAGESERVICE_URI: http://messageservice:8090/users
+      REACT_APP_MESSAGESERVICE_URI: http://messageservice:8090/user
     networks: 
       - front-tier
       - back-tier
@@ -41,13 +41,12 @@ services:
       - back-tier
 
   worker:
-    image: <$DTR_HOST>/backend/worker
+    image: <$DTR_HOST>/backend/worker:2
     networks:
       - back-tier
 
   redis:
     image: redis
-    container_name: redis
     ports: 
       - "6379:6379"
     networks:
@@ -56,28 +55,29 @@ services:
 #logging
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.1.2
-    container_name: elasticsearch
     ports:
       - "9200:9200"
       - "9300:9300"
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks: 
-      - elk
+      - back-tier
 
   kibana:
     image: docker.elastic.co/kibana/kibana-oss:6.1.2
-    container_name: kibana
     ports:
       - "5601:5601"
     networks: 
-      - elk
+      - back-tier
+      - front-tier
     depends_on:
       - elasticsearch
 
 networks:
   front-tier:
+    external: true
   back-tier:
+    external: true
 
 secrets:
   mysql_root_password:

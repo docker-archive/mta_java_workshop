@@ -590,16 +590,16 @@ services:
     ports:
       - "3306:3306"
     networks:
-	  - back-tier
-	secrets:
-	  - mysql_root_password
+      - back-tier
+    secrets:
+      - mysql_root_password
 
   webserver:
     image: <$DTR_HOST>/backend/java_web:2
     ports:
       - "8080:8080"
     environment:
-      BASEURI: http://messageservice/users
+      BASEURI: http://messageservice:8090/users
     networks:
       - front-tier
       - back-tier
@@ -674,7 +674,7 @@ CMD ["nginx", "-g", "daemon off;"]
 
 1. One of the features of Docker Enterprise Edition is that we can add containers and functionality to a running cluster with no down time. Edit the existing stack file by copying the following
 
-```bash
+```yaml
   signup_client:
     image:  <$DTR_HOST>/signup_client .
     ports:
@@ -699,9 +699,9 @@ And login from the orginal client interface.
 
 One of the advantages of splitting out a feature into a separate service is that it makes it easier to add new features. We'll take advantage of the new service interface to implement logging and monitoring.
 
-I'll implement Elasticsearch and Kibana to collect and visualize data from the application. To gather the data for the reporting database in Elasticsearch, I’ve added code to the worker that listens to events published by the web application. The analytics worker receives the data and saves it in Elasticsearch which is running in Docker container. I’ve chosen Elasticsearch because it can be clustered across multiple containers for redundancy and it has Kibana, which is an excellent front-end for analytics.
+We'll implement Elasticsearch and Kibana to collect and visualize data from the application. To gather the data for the reporting database in Elasticsearch, I’ve added code to the worker that listens to events published by the web application. The analytics worker receives the data and saves it in Elasticsearch which is running in Docker container. We're using Elasticsearch because it can be clustered across multiple containers for redundancy and it has Kibana, which is an excellent front-end for analytics.
 
-I’m not making changes to the application or the registration microservice, so I can just add new services for Elasticsearch and Kibana in the Docker Compose file. One of the features of Docker is that Docker Compose can incrementally upgrade an application. 
+We're not making changes to the application or the registration microservice, so we can just add new services for Elasticsearch and Kibana in the Docker Compose file. One of the features of Docker is that Docker Compose can incrementally upgrade an application. 
 
 ```
 #logging
@@ -727,7 +727,7 @@ I’m not making changes to the application or the registration microservice, so
       - elasticsearch
 ```
 ### <a name="task5.1"></a>Task 5.1: Add Data
-It won’t replace running containers if their definition matches the service in the Docker Compose file. Since the worker service has been updated docker-compose up -d will run the containers for the Elasticsearch, Kibana and the message handler. It will leave the other containers running as is,letting me add new features without taking the application offline.
+Adding these services won’t replace running containers if their definition matches the service in the Docker Compose file. Since the worker service has been updated Docker EE will run the containers for the Elasticsearch, Kibana. It will leave the other containers running as is,letting me add new features without taking the application offline.
 
 To make the example more visually interesting, code to calculate the age of the person based on their birthday was added to to the worker microservice. To test it out, there is a small shell script that posts the user data to the service to populate the database.
 ```
@@ -763,8 +763,93 @@ Deploy the application in Kubernetes using a Docker Compose file.
 Copy the Compose file below to deploy the application.
 
 ```yaml
-# Compose file modified to deploy using Kubernets
+version: "3.3"
+
+services:
+
+  database:
+    image: <$DTR_HOST>/backend/database
+    environment:
+      MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
+    ports:
+      - "3306:3306"
+    networks:
+      - back-tier
+    secrets:
+      - mysql_root_password
+
+  webserver:
+    image: <$DTR_HOST>/backend/java_web:2
+    ports:
+      - "8080:8080"
+    environment:
+      BASEURI: http://messageservice:8090/users
+    networks:
+      - front-tier
+      - back-tier
+
+  signup_client:
+    image:  <$DTR_HOST>/signup_client
+    ports:
+      - "8000:80"
+    environment:
+      REACT_APP_MESSAGESERVICE_URI: http://messageservice:8090/users
+    networks: 
+      - front-tier
+      - back-tier
+
+  messageservice:
+    image: <$DTR_HOST>/backend/messageservice
+    ports:
+      - "8090:8090"
+    networks:
+      - back-tier
+
+  worker:
+    image: <$DTR_HOST>/backend/worker
+    networks:
+      - back-tier
+
+  redis:
+    image: redis
+    container_name: redis
+    ports: 
+      - "6379:6379"
+    networks:
+      - back-tier
+
+#logging
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.1.2
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks: 
+      - elk
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:6.1.2
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    networks: 
+      - elk
+    depends_on:
+      - elasticsearch
+
+networks:
+  front-tier:
+  back-tier:
+
+secrets:
+  mysql_root_password:
+    external: true
+
 ```
+
 
 ###  <a name="task6.2></a>Task 6.2: Check out the Deployment on the Command Line
 

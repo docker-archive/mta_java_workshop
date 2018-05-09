@@ -1,28 +1,24 @@
-version: "3.3"
+vversion: "3.3"
 
 services:
 
   database:
-    build:
-      context: ./database
-    image: registrationdb
+    image: <$DTR_HOST>/backend/database
     # set default mysql root password, change as needed
     environment:
-      MYSQL_ROOT_PASSWORD: password
-    # Expose port 3306 to host. Not for the application but
-    # handy to inspect the database from the host machine.
+      MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
+    # Expose port 3306 to host. 
     ports:
       - "3306:3306" 
     networks:
       - back-tier
+    secrets:
+      - mysql_root_password
 
   webserver:
-    build: 
-      context: ./appserver
-    image: registration
+    image: <$DTR_HOST>/frontend/java_web:1
     ports:
       - "8080:8080" 
-      - "8000:8000"
     networks:
       - front-tier
       - back-tier
@@ -30,5 +26,9 @@ services:
 networks:
   back-tier:
   front-tier:
+
+secrets:
+  mysql_root_password:
+    external: true
 
  

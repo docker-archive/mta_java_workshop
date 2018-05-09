@@ -3,39 +3,40 @@ version: "3.3"
 services:
 
   database:
-    image: database
+    image: <$DTR_HOST>/backend/database
     environment:
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
     ports:
-      - "3306:3306" 
+      - "3306:3306"
     networks:
       - back-tier
+    secrets:
+      - mysql_root_password
 
   webserver:
-    image:  java_web:2
+    image: <$DTR_HOST>/frontend/java_web:2
+    ports:
+      - "8080:8080"
     environment:
       BASEURI: http://messageservice:8090/user
-    ports:
-      - "8080:8080" 
     networks:
       - front-tier
       - back-tier
 
   messageservice:
-    image: messageservice
+    image: <$DTR_HOST>/backend/messageservice
     ports:
       - "8090:8090"
-    networks: 
+    networks:
       - back-tier
 
   worker:
-    image: worker
-    networks: 
+    image: <$DTR_HOST>/backend/worker:1
+    networks:
       - back-tier
 
   redis:
     image: redis
-    container_name: redis
     ports: 
       - "6379:6379"
     networks:
@@ -43,4 +44,10 @@ services:
 
 networks:
   front-tier:
+    external: true
   back-tier:
+    external: true
+
+secrets:
+  mysql_root_password:
+    external: true
