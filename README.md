@@ -29,13 +29,13 @@ In this lab we'll use a Docker EE cluster. We'll initially deploy both a Java n-
 >   * [Task 3.1: Building the Microservices Images](#task3.1)
 >   * [Task 3.2: Push to DTR](#task3.2)
 >   * [Task 3.3: Run the Application in UPC](#task3.3)
-> * [Task 4: Iterating on the Client](#task4)
->   * [Task 4.1: Building the Javascript Client](#task4.1)
->   * [Task 4.2: Deploying on a Running Cluster](#task4.2)
-> * [Task 5: Adding Logging and Monitoring](#task5)
->   * [Task 5.1: Add Data](#task5.1)
->   * [Task 5.2: Display Data on Kibana](#task5.2)
-> * [Task 6: Deploying on Kubernetes (#task6)]
+> * [Task 4: Adding Logging and Monitoring](#task4)
+>   * [Task 4.1: Add Data](#task4.1)
+>   * [Task 4.2: Display Data on Kibana](#task4.2)
+> * [Task 5: Orchestration with Docker Swarm](#task5)
+>   * [Task 5.1: Building the Javascript Client](#task5.1)
+>   * [Task 5.2: Deploying on a Running Cluster](#task5.2)
+> * [Task 6: Deploying on Kubernetes](#task6)]
 
 ## Understanding the Play With Docker Interface
 
@@ -205,11 +205,17 @@ Now that we've completely configured our cluster, let's deploy a couple of web a
 3. Set an environment variable `DTR_HOST` using the DTR host name defined on your Play with Docker landing page:
 
 	```bash
-	$ export DTR_HOST=<dtr hostname>
+	$ export DTR_HOST=<DTR hostname>
 	$ echo $DTR_HOST
 	```
+4. Set an environment variable `UCP_HOST` using the DTR host name defined on your Play with Docker landing page:
 
-4. Now use git to clone the workshop repository.
+	```bash
+	$ export UCP_HOST=<UCP hostname>
+	$ echo $UCP_HOST
+	```
+
+5. Now use git to clone the workshop repository.
 
 	```bash
 	$ git clone https://github.com/dockersamples/mta_java_workshop.git
@@ -228,6 +234,10 @@ Now that we've completely configured our cluster, let's deploy a couple of web a
 	```
 
 	You now have the necessary code on your worker host.
+
+#### OPTIONAL
+
+If you have git installed on your computer, cloning the repository to a local directory will simplify some steps by letting you upload files instead of copying and pasting from the tutorial.
 
 ### <a name="task2.2"></a> Task 2.2: Building the Web App and Database Images
 
@@ -427,8 +437,10 @@ In this section, the java_web application is pulled from DTR and named the servi
 
 ```yaml
     networks:
-      back-tier:
-      front-tier:
+	  back-tier:
+	    external: true
+	  front-tier:
+	    external: true
 ```
 
 In this section, two networks are defined, the back-tier network isolates backend components from components on the front-tier network. This seems unnecessary in this current configuration but we'll make use of the networks in later iterations.
@@ -489,7 +501,9 @@ services:
 
 networks:
   back-tier:
+    external: true
   front-tier:
+    external: true
 
 secrets:
   mysql_root_password:
@@ -626,76 +640,16 @@ services:
 
 networks:
   front-tier:
+    external: true
   back-tier:
+    external: true
 
 secrets:
   mysql_root_password:
     external: true
 ```
 
-## <a name="task4"></a>Task 4: Iterating on the Client
-
-Another benefit adding the messaging service is that it's now possible to update the client without having to rebuild the application. The original application used Java Server Pages for the client UI which is compiled along with the servlet. The message service let's us write another client in Javascript that's not dependent on the Java application.
-
-## <a name="task4.1"></a>Task 4.1: Building the Javascript Client
-
-We'll use React.js along with Bootstrap to write the new client interface. React is a popular Javascript framework that has many built in features such as the calendar widget in the form fields. In addition, Bootstrap is a well known CSS library used for responsive web pages. One advantage is that updating the client no longer needs a Java developer and can be done by a front end developer.
-
-The client uses a Node.js container to build the javascript client and deployed it is to Nginx using a multi-stage build.
-
-```
-FROM node:latest AS build-deps
-WORKDIR /usr/src/signup_client
-COPY package.json yarn.lock ./
-RUN yarn
-COPY . ./
-RUN yarn build
-
-FROM nginx:alpine
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build-deps /usr/src/signup_client/build/ /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-```
-
-1. Build the javascript client:
-
-```bash
-   $ cd ./part_4/signup_client
-   $ docker image build -t $DTR_HOST/signup_client .
-```
-
-2. Push the javascript client to DTR:
-
-```bash
-   $ docker push $DTR_HOST/signup_client .
-```
-## <a name="task4.2"></a>Task 4.2: Deploying on a Running Cluster
-
-1. One of the features of Docker Enterprise Edition is that we can add containers and functionality to a running cluster with no down time. Edit the existing stack file by copying the following
-
-```yaml
-  signup_client:
-    image:  <$DTR_HOST>/signup_client .
-    ports:
-      - "8000:80"
-    networks: 
-      - front-tier
-```
-
-[screen shots of updating the existing stack ]
-
-
-2. I can sign up a new user with the client by browsing to the client `http://<UCP HOST>:8000/`
-
-![javascript cleint](./images/js_client_interface.png)
-
-And login from the orginal client interface.
-
-![java client login](./images/user_login.png)
-
-
-## <a name="task5"></a>Task 5: Adding Logging and Monitoring
+## <a name="task4"></a>Task 4: Adding Logging and Monitoring
 
 One of the advantages of splitting out a feature into a separate service is that it makes it easier to add new features. We'll take advantage of the new service interface to implement logging and monitoring.
 
@@ -726,22 +680,74 @@ We're not making changes to the application or the registration microservice, so
     depends_on:
       - elasticsearch
 ```
-### <a name="task5.1"></a>Task 5.1: Add Data
+### <a name="task5.1"></a>Task 4.1: Add Data
 Adding these services won’t replace running containers if their definition matches the service in the Docker Compose file. Since the worker service has been updated Docker EE will run the containers for the Elasticsearch, Kibana. It will leave the other containers running as is,letting me add new features without taking the application offline.
 
-To make the example more visually interesting, code to calculate the age of the person based on their birthday was added to to the worker microservice. To test it out, there is a small shell script that posts the user data to the service to populate the database.
+To make the example more visually interesting, code to calculate the age of the person based on their birthday was added to to the worker microservice and a new image, tagged worker:2, was deployed to the cluster. To test it out, there is a small shell script that posts user data to the messageservice that will populate the database. To run the script:
+
 ```
 $ ./firefly_data.sh
 ```
+### <a name=task5.2></a>Task 4.2: Display Data on Kibana
 
-### <a name=task5.2></a>Task 5.2: Display Data on Kibana
-Now, I can use Kibana to index the data and look at the data.
+We can use Kibana to index the data and look at the data. Go to `http:/<$UCP_HOST>:5601`
 
-![data](./images/kibana6.png)
+![](./images/kibana.png)
 
-I can then make a chart of the character's ages using a Kibana visualization.
+1. Index the data by clicking on `Management` in the menu bar on the left. Type `signup` as the Index patter and click `Next step`
 
-![chart](./images/kibana7.png)
+![](./images/kibana_create_index_1.png)
+
+In Step 2 of 2 Configure settings, click on `Create index pattern`
+
+![](./images/kibana_create_index_2.png)
+
+All the fields associated with the index pattern are displayed. Note that an age field has been added to the user data when it was written to Elasticsearch by the worker service.
+
+![](./images/kibana_create_index_3.png)
+
+We can also inspect the data by clicking on `Discover` in the left menu bar.
+
+![](./images/kibana_discover.png)
+
+2. Create a visualization by clicking on `Visualize` in the left menu bar. 
+
+![](./images/kibana_visualize.png)
+
+Next, select the visualization type, we'll use a `vertical bar` chart for the visualization.
+
+![](./images/kibana_select_visualization.png)
+
+Click on `signup` to select it as the index used in the visualization
+
+![](./images/kibana_visualization_select_index.png)
+
+To create the visualiztion, click on the button next to `Y-Axis`. For `Aggregation`, select `Average`. For `Field` select `age`. Type in `AGE` as `Custom Label`
+
+Under `Buckets` select `X-Axis`. For `Aggregation` select `Terms` from the pulldown menu. Under `Field` select `userName.keyword` and for `Custom Label` type `User Name`.
+
+![](./images/kibana_new_visualization.png)
+
+Finally, to display the barchart, click on the triangle in the blue box at the top of the configuration panel.
+
+![](./images/kibana_display_visualization.png)
+
+The visualization is a vertical bar chart of the ages of the people registered in the database.
+
+![](./images/kibana_age_bar_chart.png)
+
+
+
+
+## <a name="task5"></a>Task 5: Orchestration with Swarm,
+
+
+
+## <a name="task4.1"></a>Task 5.1: Add Visualizer
+
+
+## <a name="task4.2"></a>Task 5.2: Deploying the Stack
+
 
 
 ## <a name="task6"></a>Task 6: Deploying in Kubernetes
@@ -842,14 +848,14 @@ services:
 
 networks:
   front-tier:
+    external: true
   back-tier:
+    external: true
 
 secrets:
   mysql_root_password:
     external: true
-
 ```
-
 
 ###  <a name="task6.2></a>Task 6.2: Check out the Deployment on the Command Line
 

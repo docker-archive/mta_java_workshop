@@ -48,6 +48,7 @@ class Worker {
     insert.setString(7, userName);
     try {
       insert.executeUpdate();
+      System.out.println("inserted into MySQL: " + userName );
     } catch (SQLException e) {
       e.printStackTrace();
     }

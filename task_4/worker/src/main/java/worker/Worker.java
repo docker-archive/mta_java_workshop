@@ -55,7 +55,9 @@ class Worker {
         System.err.printf("Processing user '%s' with id '%s'\n", userName, userId);
         
         sendToElasticsearch(restClient, userData, LOGGER);
+        System.out.println("inserted into Elasticsearch: " + userName );
         addUser(dbConn, userId, dateOfBirth, emailAddress, firstName, lastName, password, userName);
+        System.out.println("inserted in MySQL: " + userName );
       }
     } catch (SQLException e) {
       e.printStackTrace();

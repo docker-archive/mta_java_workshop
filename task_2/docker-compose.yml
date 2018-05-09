@@ -1,4 +1,4 @@
-vversion: "3.3"
+version: "3.3"
 
 services:
 
@@ -25,8 +25,10 @@ services:
 
 networks:
   back-tier:
+    external: true
   front-tier:
-
+    external: true
+    
 secrets:
   mysql_root_password:
     external: true
