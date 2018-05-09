@@ -736,10 +736,9 @@ The visualization is a vertical bar chart of the ages of the people registered i
 
 ![](./images/kibana_age_bar_chart.png)
 
+In this section, we added logging and visualization capabilities with only a minor change to our application. By modernizing a traditional Java application through adding microservices, we can add other services to improve the application.
 
-
-
-## <a name="task5"></a>Task 5: Orchestration with Swarm,
+## <a name="task5"></a>Task 5: Orchestration with Swarm
 
 
 
