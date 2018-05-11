@@ -405,7 +405,7 @@ Docker automates the process of building and running the application from a sing
 We'll go through the Compose [file](./part_2/docker-compose.yml) 
 
 ```yaml
-    version: "3.3"
+    version: "3.6"
 
     services:
 
@@ -474,7 +474,7 @@ You can do that right in the edit box in `UCP` but make sure you saw that first.
 	Here's the `Compose` file. Once you've copy and pasted it in, and made the changes, click `Create` in the lower right corner.
 
 ```yaml
-version: "3.3"
+version: "3.6"
 
 services:
 
@@ -593,15 +593,13 @@ Adding microservices adds complexity to deployment and maintenance when compared
 To run the application, create a new stack using this compose file:
 
 ```yaml
-version: "3.3"
+version: "3.6"
 
 services:
 
   database:
     image: <$DTR_HOST>/backend/database
-    environment:
-      MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
-    ports:
+    enviro
       - "3306:3306"
     networks:
       - back-tier
@@ -646,7 +644,9 @@ networks:
 
 secrets:
   mysql_root_password:
-    external: true
+    external: truenment:
+      MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
+    ports:
 ```
 
 ## <a name="task4"></a>Task 4: Adding Logging and Monitoring
@@ -680,7 +680,7 @@ We're not making changes to the application or the registration microservice, so
     depends_on:
       - elasticsearch
 ```
-### <a name="task5.1"></a>Task 4.1: Add Data
+### <a name="task4.1"></a>Task 4.1: Add Data
 Adding these services won’t replace running containers if their definition matches the service in the Docker Compose file. Since the worker service has been updated Docker EE will run the containers for the Elasticsearch, Kibana. It will leave the other containers running as is,letting me add new features without taking the application offline.
 
 To make the example more visually interesting, code to calculate the age of the person based on their birthday was added to to the worker microservice and a new image, tagged worker:2, was deployed to the cluster. To test it out, there is a small shell script that posts user data to the messageservice that will populate the database. To run the script:
@@ -688,7 +688,88 @@ To make the example more visually interesting, code to calculate the age of the 
 ```
 $ ./firefly_data.sh
 ```
-### <a name=task5.2></a>Task 4.2: Display Data on Kibana
+### <a name=task4.2></a>Task 4.2: Display Data on Kibana
+
+Create a stack that includes the Elasticsearch and Kibanna
+
+```yaml
+version: "3.6"
+
+services:
+
+  database:
+    image: <$DTR_HOST>/backend/database
+    environment:
+      MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
+    ports:
+      - "3306:3306"
+    networks:
+      - back-tier
+    secrets:
+      - mysql_root_password
+
+  webserver:
+    image: <$DTR_HOST>/frontend/java_web:2
+    ports:
+      - "8080:8080"
+    environment:
+      BASEURI: http://messageservice:8090/user
+    networks:
+      - front-tier
+      - back-tier
+
+  messageservice:
+    image: <$DTR_HOST>/backend/messageservice
+    ports:
+      - "8090:8090"
+    networks:
+      - back-tier
+
+  worker:
+    image: <$DTR_HOST>/backend/worker:2
+    networks:
+      - back-tier
+
+  redis:
+    image: redis
+    ports: 
+      - "6379:6379"
+    networks:
+      - back-tier
+
+#logging
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.1.2
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks: 
+      - back-tier
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:6.1.2
+    ports:
+      - "5601:5601"
+    networks: 
+      - back-tier
+      - front-tier
+    depends_on:
+      - elasticsearch
+
+networks:
+  front-tier:
+    external: true
+  back-tier:
+    external: true
+
+secrets:
+  mysql_root_password:
+    external: true
+```
+
+### <a name=task4.3></a>Task 4.3: Display Data on Kibana
 
 We can use Kibana to index the data and look at the data. Go to `http:/<$UCP_HOST>:5601`
 
@@ -740,13 +821,276 @@ In this section, we added logging and visualization capabilities with only a min
 
 ## <a name="task5"></a>Task 5: Orchestration with Swarm
 
+In Task 2 we modernized the java applicatio by adding microservices that will allow it to scale. This section we'll discuss the process of scaling the application to handle more requests.
 
 
-## <a name="task4.1"></a>Task 5.1: Add Visualizer
+### Number of Managers
 
+The recommended number of managers for a production cluster is 3 or 5. A 3-manager cluster can tolerate the loss of one manager, and a 5-manager cluster can tolerate two instantaneous manager failures. Clusters with more managers can tolerate more manager failures, but adding more managers also increases the overhead of maintaining and committing cluster state in the Docker Swarm Raft quorum. In some circumstances, clusters with more managers (for example 5 or 7) may be slower (in terms of cluster-update latency and throughput) than a cluster with 3 managers and otherwise similar specs.
 
-## <a name="task4.2"></a>Task 5.2: Deploying the Stack
+Managers in a production cluster should ideally have at least 16GB of RAM and 4 vCPUs. Testing done by Docker has shown that managers with 16GB RAM are not memory constrained, even in clusters with 100s of workers and many services, networks, and other metadata.
 
+On production clusters, never run workloads on manager nodes. This is a configurable manager node setting in Docker Universal Control Plane (UCP).
+
+### Worker Nodes Size and Count
+
+For worker nodes, the overhead of Docker components and agents is not large — typically less than 1GB of memory. Deciding worker size and count can be done similar to how you currently size app or VM environments. For example, you can determine the app memory working set under load and factor in how many replicas you want for each app (for durability in case of task failure and/or for throughput). That will give you an idea of the total memory required across workers in the cluster.
+
+By default, a container has no resource constraints and can use as much of a given resource as the host’s kernel scheduler allows. You can limit a container's access to memory and CPU resources. With the release of Java 10, containers running the Java Virtual Machine will comply with the limits set by Docker.
+
+## <a name="task5.1"></a>Task 5.1: Configure Workloads to Only Run on Workers
+
+Click on `Admin` > `Admin Settings` in the left menu sidebar.
+
+![](./images/admin_settings.png)
+
+Click on `Scheduler` and under `Container Scheduling` uncheck the first option `Allow administrators to deploy containers on UCP managers or nodes running DTR`
+
+## <a name="task5.2"></a>Task 5.2: Configuring Containers for Deployment
+
+We'll use the Redis container as example on how to configure containers for production.
+
+```yaml
+  redis:
+    image: redis
+    deploy:
+      mode: replicated
+      replicas: 3
+    resources:
+      limits:
+        cpus: '0.5'
+        memory: 50M
+      reservations:
+        cpus: '0.25'
+        memory: 20M
+    placement:
+        constraints: [node.role == worker]
+    restart_policy:
+      condition: on-failure
+      delay: 5s
+      max_attempts: 3s
+      window: 120s
+    update_config:
+          parallelism: 2
+          delay: 10s
+          order: stop-first
+    ports:
+      - "6379:6379"
+    networks:
+      - back-tier
+```
+### Deploy
+
+The deploy directive sets the `mode` to either `global` which is one container per node or `replicated` which specifies the number of containers with the `replicas` parameters. The example launches 3 Redis containers.
+
+### Resources
+
+The `resources` directive sets the `limits` on the memory and CPU available to the container. `Reservations` ensures that the specified amount will always be available to the container.
+
+### Placement
+
+Placement specifies constraints and preferences for a container. Constraints let you specify which nodes where a task can be scheduled. For example, you can specify that a container run only on a worker node, as in the example. Other contraints are:
+
+|node | attribute matches | example|
+|-----|-------------------|--------|
+|node.id | Node ID | node.id==2ivku8v2gvtg4 |
+|node.hostname | Node hostname | node.hostname!=node-2|
+|node.role | Node role | node.role==manager |
+|node.labels |user defined node labels | node.labels.security==high|
+|engine.labels |Docker Engine's labels	|engine.labels.operatingsystem==ubuntu 14.04 |
+
+Preferences divide tasks evenly over different categories of nodes. One example of where this can be useful is to balance tasks over a set of datacenters or availability zones. For example, consider the following set of nodes:
+
+* Three nodes with node.labels.datacenter=east
+* Two nodes with node.labels.datacenter=south
+* One node with node.labels.datacenter=west
+
+Since we are spreading over the values of the datacenter label and the service has 9 replicas, 3 replicas will end up in each datacenter. There are three nodes associated with the value east, so each one will get one of the three replicas reserved for this value. There are two nodes with the value south, and the three replicas for this value will be divided between them, with one receiving two replicas and another receiving just one. Finally, west has a single node that will get all three replicas reserved for west.
+
+### Restart Policy
+
+Restart_policy configures if and how to restart containers when they exit. restart.
+
+* `condition`: One of none, on-failure or any (default: any).
+* `delay`: How long to wait between restart attempts, specified as a duration (default: 0).
+* `max_attempts`: How many times to attempt to restart a container before giving up (default: never give up). 
+* `window`: How long to wait before deciding if a restart has succeeded, specified as a duration (default: decide immediately).
+
+### Update Config
+
+Update_config configures how the service should be updated. Useful for configuring rolling updates.
+
+* `parallelism`: The number of containers to update at a time.
+* `delay`: The time to wait between updating a group of containers.
+* `failure_action`: What to do if an update fails. One of continue, rollback, or pause (default: pause).
+* `monitor`: Duration after each task update to monitor for failure (ns|us|ms|s|m|h) (default 0s).
+* `max_failure_ratio`: Failure rate to tolerate during an update.
+* `order`: Order of operations during updates. One of stop-first (old task is stopped before starting new one), or start-first (new task is started first, and the running tasks briefly overlap) (default stop-first) 
+
+## <a name="task5.3"></a>Task 5.3: Deploying in Production
+
+Deploy the application as an application stack in Docker EE
+
+```yaml
+version: "3.6"
+
+services:
+
+  database:
+    image: <$DTR_HOST>/backend/database
+    deploy:
+      mode: global
+    resources:
+      limits:
+        cpus: '0.5'
+        memory: 100M
+      reservations:
+        cpus: '0.25'
+        memory: 50M
+    placement:
+        constraints: [node.role == worker]
+    restart_policy:
+      condition: on-failure
+      delay: 5s
+      max_attempts: 3s
+      window: 120s
+    environment:
+      MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
+    ports:
+      - "3306:3306"
+    networks:
+      - back-tier
+    secrets:
+      - mysql_root_password
+
+  webserver:
+    image: <$DTR_HOST>/backend/java_web:2
+    deploy:
+      mode: replicated
+      replicas: 3
+    resources:
+      limits:
+        cpus: '0.5'
+        memory: 50M
+      reservations:
+        cpus: '0.25'
+        memory: 20M
+    placement:
+        constraints: [node.role == worker]
+    restart_policy:
+      condition: on-failure
+      delay: 5s
+      max_attempts: 3s
+      window: 120s
+    update_config:
+          parallelism: 2
+          delay: 10s
+          order: stop-first
+    ports:
+      - "8080:8080"
+    environment:
+      BASEURI: http://messageservice:8090/users
+    networks:
+      - front-tier
+      - back-tier
+
+  messageservice:
+    image: <$DTR_HOST>/backend/messageservice
+    deploy:
+      mode: replicated
+      replicas: 3
+    resources:
+      limits:
+        cpus: '0.25'
+        memory: 20M
+      reservations:
+        cpus: '0.25'
+        memory: 10M
+    placement:
+        constraints: [node.role == worker]
+    restart_policy:
+      condition: on-failure
+      delay: 5s
+      max_attempts: 3s
+      window: 120s
+    ports:
+      - "8090:8090"
+    networks:
+      - back-tier
+
+  worker:
+    image: <$DTR_HOST>/backend/worker
+        deploy:
+      mode: replicated
+      replicas: 3
+    resources:
+      limits:
+        cpus: '0.1'
+        memory: 10M
+      reservations:
+        cpus: '0.1'
+        memory: 5M
+    placement:
+        constraints: [node.role == worker]
+    restart_policy:
+      condition: on-failure
+      delay: 5s
+      max_attempts: 3s
+      window: 120s
+    update_config:
+          parallelism: 2
+          delay: 10s
+          order: stop-first
+    networks:
+      - back-tier
+
+  redis:
+    image: redis
+    deploy:
+      mode: replicated
+      replicas: 3
+    resources:
+      limits:
+        cpus: '0.5'
+        memory: 50M
+      reservations:
+        cpus: '0.25'
+        memory: 20M
+    placement:
+        constraints: [node.role == worker]
+    restart_policy:
+      condition: on-failure
+      delay: 5s
+      max_attempts: 3s
+      window: 120s
+    update_config:
+          parallelism: 2
+          delay: 10s
+          order: stop-first
+    ports:
+      - "6379:6379"
+    networks:
+      - back-tier
+
+networks:
+  front-tier:
+    external: true
+  back-tier:
+    external: true
+
+secrets:
+  mysql_root_password:
+    external: true
+```
+## <a name="task5.4"></a>Task 5.4: Visualize the Deployment
+
+We can use the Docker Swarm visualizer to see the deployment graphically. To do this, go back to the master node terminal and run:
+
+```bash
+docker run -it -d -p 3000:8080 -v /var/run/docker.sock:/var/run/docker.sock dockersamples/visualizer
+```
+
+In your browser, go to http://<$UCP_HOST>:3000 to see the containers and how they are distributed across the cluster.
 
 
 ## <a name="task6"></a>Task 6: Deploying in Kubernetes
@@ -756,19 +1100,19 @@ Docker EE gives you the choice of which orchestrator that you want to choose. Th
 ### <a name="task6.1></a>Task 6.1: Delete the Stack
 
 Delete the application stack you deployed in Docker Swarm
-	
+
 ![](example images deleting stack)
 
 ### <a name="task6.1></a>Task 6.1: Deploy Application in Kubernetes with a Compose File
 
-Deploy the application in Kubernetes using a Docker Compose file. 
+Deploy the application in Kubernetes using a Docker Compose file.
 
 ![](example images of deploying to Kubernetes)
 
 Copy the Compose file below to deploy the application.
 
 ```yaml
-version: "3.3"
+version: "3.6"
 
 services:
 
@@ -790,16 +1134,6 @@ services:
     environment:
       BASEURI: http://messageservice:8090/users
     networks:
-      - front-tier
-      - back-tier
-
-  signup_client:
-    image:  <$DTR_HOST>/signup_client
-    ports:
-      - "8000:80"
-    environment:
-      REACT_APP_MESSAGESERVICE_URI: http://messageservice:8090/users
-    networks: 
       - front-tier
       - back-tier
 
@@ -878,9 +1212,6 @@ $ kubectl get pods
 $ kubectl get lbs
 ```
 
-... yatta yatta yatta
-
-
 ###  <a name="task6.3></a>Task 6.3: Check out the Deployment using UCP
 
 1. View pods
@@ -889,11 +1220,21 @@ $ kubectl get lbs
 
 3. View loadbalancers
 
-...  yatta yatta yatta
-
 ## Conclusion
 
+
+
 ### What we covered
+
+We started with basic N-Tier monolithic application composed of a Java application and a relational database. As a first step, we first deployed the application as-is to see how it would run in a containerized environment. 
+
+The next step was to determine if any parts of the application could be refactored to make it more scalable. One factor that affects application performance is multiple writes to the database. To address this bottleneck, we implemented a message service that writes the user data to Redis, a key-value data store, to hold the data until a worker service writes it the the database. The messaging queue was implemented with REST interface and we modified the Java app to send the data to the message service.
+
+Implementing the message service opened up possibilities for adding new functions such as monitoring and visualization of the user data. We added Elasticsearch and Kibana containers to the stack and produced a visualization just by adding these services to the Docker Compose file.
+
+In the following section, we looked at how to configure the application to deploy in a production environment by adding parameters that scaled and configured the services appropriately. We used another container to visualize the deployment across multiple containers.
+
+In the final section, we changed the orchestrator from Docker Swarm to Kubernetes and deployed the application using Kubernetes. From the command line we queried the Kubernetes API about resources we deployed. We also were able to the same tasks using the Docker EE interface.
 
 ### Modernization Workflow
 
