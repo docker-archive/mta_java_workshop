@@ -56,7 +56,7 @@
 				<input type="text" class="form-control" placeholder="Search">
 			</form>
 			<ul class="nav navbar-nav navbar-right">
-				<li><a href="/Signup">Home</a></li>
+				<li><a href="/java-web">Home</a></li>
 				<li class="active"><a href="signup.html">Signup</a></li>
 				<li><a href="login.html">Login</a></li>
 				<li class="dropdown"><a href="#" class="dropdown-toggle"
@@ -85,7 +85,7 @@
 	<div class="container">
 		<div class="jumbotron">
 			<div>
-				<h1>Welcome to Registration</h1>
+				<h1>Welcome to Signup</h1>
 			</div>
 		</div>
 

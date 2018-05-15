@@ -1,4 +1,4 @@
-version: "3.6"
+version: "3.3"
 
 services:
 
@@ -20,16 +20,6 @@ services:
     environment:
       BASEURI: http://messageservice:8090/user
     networks:
-      - front-tier
-      - back-tier
-
-  signup_client:
-    image:  <$DTR_HOST>/frontend/signup_client
-    ports:
-      - "8000:80"
-    environment:
-      REACT_APP_MESSAGESERVICE_URI: http://messageservice:8090/user
-    networks: 
       - front-tier
       - back-tier
 

@@ -21,11 +21,13 @@ docker image build -t $DTR_HOST/backend/worker:1 .
 
 cd $repo_path/task_5/worker
 docker image build -t $DTR_HOST/backend/worker:2 .
+docker image build -t $DTR_HOST/frontend/java_web:3 .
 
 # push images to Docker Trusted Registry
 docker login -u frontend_user -p user1234 $DTR_HOST
 docker image push $DTR_HOST/frontend/java_web:1
 docker image push $DTR_HOST/frontend/java_web:2
+docker image push $DTR_HOST/frontend/java_web:3
 
 docker login -u backend_user -p user1234 $DTR_HOST
 docker image push $DTR_HOST/backend/database

@@ -274,7 +274,7 @@ ADD tomcat/mysql-connector-java-5.1.36-bin.jar $CATALINA_HOME/lib/
 
 # create mount point for volume with application
 WORKDIR $CATALINA_HOME/webapps/
-COPY --from=devenv /usr/src/signup/target/Signup.war .
+COPY --from=devenv /usr/src/signup/target/java-web.war .
 
 # start tomcat7 with remote debugging
 EXPOSE 8080
@@ -405,7 +405,7 @@ Docker automates the process of building and running the application from a sing
 We'll go through the Compose [file](./part_2/docker-compose.yml) 
 
 ```yaml
-    version: "3.6"
+    version: "3.3"
 
     services:
 
@@ -474,7 +474,7 @@ You can do that right in the edit box in `UCP` but make sure you saw that first.
 	Here's the `Compose` file. Once you've copy and pasted it in, and made the changes, click `Create` in the lower right corner.
 
 ```yaml
-version: "3.6"
+version: "3.3"
 
 services:
 
@@ -593,7 +593,7 @@ Adding microservices adds complexity to deployment and maintenance when compared
 To run the application, create a new stack using this compose file:
 
 ```yaml
-version: "3.6"
+version: "3.3"
 
 services:
 
@@ -693,7 +693,7 @@ $ ./firefly_data.sh
 Create a stack that includes the Elasticsearch and Kibanna
 
 ```yaml
-version: "3.6"
+version: "3.3"
 
 services:
 
@@ -932,28 +932,15 @@ Update_config configures how the service should be updated. Useful for configuri
 Deploy the application as an application stack in Docker EE
 
 ```yaml
-version: "3.6"
+version: "3.3"
 
 services:
 
   database:
     image: <$DTR_HOST>/backend/database
     deploy:
-      mode: global
-    resources:
-      limits:
-        cpus: '0.5'
-        memory: 100M
-      reservations:
-        cpus: '0.25'
-        memory: 50M
-    placement:
+      placement:
         constraints: [node.role == worker]
-    restart_policy:
-      condition: on-failure
-      delay: 5s
-      max_attempts: 3s
-      window: 120s
     environment:
       MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
     ports:
@@ -964,32 +951,31 @@ services:
       - mysql_root_password
 
   webserver:
-    image: <$DTR_HOST>/backend/java_web:2
+    image: <$DTR_HOST>/frontend/java_web:3
     deploy:
       mode: replicated
-      replicas: 3
-    resources:
-      limits:
-        cpus: '0.5'
-        memory: 50M
-      reservations:
-        cpus: '0.25'
-        memory: 20M
-    placement:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      placement:
         constraints: [node.role == worker]
-    restart_policy:
-      condition: on-failure
-      delay: 5s
-      max_attempts: 3s
-      window: 120s
-    update_config:
-          parallelism: 2
-          delay: 10s
-          order: stop-first
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 786M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+      update_config:
+        parallelism: 2
+        delay: 10s
     ports:
       - "8080:8080"
     environment:
-      BASEURI: http://messageservice:8090/users
+      BASEURI: http://messageservice:8090/user
     networks:
       - front-tier
       - back-tier
@@ -998,75 +984,57 @@ services:
     image: <$DTR_HOST>/backend/messageservice
     deploy:
       mode: replicated
-      replicas: 3
-    resources:
-      limits:
-        cpus: '0.25'
-        memory: 20M
-      reservations:
-        cpus: '0.25'
-        memory: 10M
-    placement:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+      placement:
         constraints: [node.role == worker]
-    restart_policy:
-      condition: on-failure
-      delay: 5s
-      max_attempts: 3s
-      window: 120s
     ports:
       - "8090:8090"
     networks:
       - back-tier
 
   worker:
-    image: <$DTR_HOST>/backend/worker
-        deploy:
+    image: <$DTR_HOST>/backend/worker:2
+    deploy:
       mode: replicated
-      replicas: 3
-    resources:
-      limits:
-        cpus: '0.1'
-        memory: 10M
-      reservations:
-        cpus: '0.1'
-        memory: 5M
-    placement:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+      placement:
         constraints: [node.role == worker]
-    restart_policy:
-      condition: on-failure
-      delay: 5s
-      max_attempts: 3s
-      window: 120s
-    update_config:
-          parallelism: 2
-          delay: 10s
-          order: stop-first
     networks:
       - back-tier
+      - front-tier
 
   redis:
     image: redis
     deploy:
       mode: replicated
-      replicas: 3
-    resources:
-      limits:
-        cpus: '0.5'
-        memory: 50M
-      reservations:
-        cpus: '0.25'
-        memory: 20M
-    placement:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      placement:
         constraints: [node.role == worker]
-    restart_policy:
-      condition: on-failure
-      delay: 5s
-      max_attempts: 3s
-      window: 120s
-    update_config:
-          parallelism: 2
-          delay: 10s
-          order: stop-first
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      update_config:
+        parallelism: 2
+        delay: 10s
     ports:
       - "6379:6379"
     networks:
@@ -1112,7 +1080,7 @@ Deploy the application in Kubernetes using a Docker Compose file.
 Copy the Compose file below to deploy the application.
 
 ```yaml
-version: "3.6"
+version: "3.3"
 
 services:
 
@@ -1237,6 +1205,9 @@ In the following section, we looked at how to configure the application to deplo
 In the final section, we changed the orchestrator from Docker Swarm to Kubernetes and deployed the application using Kubernetes. From the command line we queried the Kubernetes API about resources we deployed. We also were able to the same tasks using the Docker EE interface.
 
 ### Modernization Workflow
+
+The modernization workflow is based on whether the application is
+
 
 ### Agility
 

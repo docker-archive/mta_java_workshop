@@ -30,7 +30,7 @@ import com.docker.UserSignup.model.UserLogin;
 import com.docker.UserSignup.service.UserService;
 
 @Controller
-@SessionAttributes("user")
+// @SessionAttributes("user")
 public class UserController {
 	
 	@Autowired
