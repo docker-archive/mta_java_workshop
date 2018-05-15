@@ -1,9 +1,25 @@
-version: "3.6"
+version: "3.3"
 
 services:
 
   database:
     image: <$DTR_HOST>/backend/database
+    deploy:
+#      mode: global
+#      restart_policy:
+#        condition: on-failure
+#        delay: 5s
+#        max_attempts: 3
+#        window: 120s
+      placement:
+        constraints: [node.role == worker]
+#      resources:
+#        limits:
+#          cpus: '0.5'
+#          memory: 100M
+#        reservations:
+#          cpus: '0.25'
+#          memory: 50M
     environment:
       MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
     ports:
@@ -14,7 +30,28 @@ services:
       - mysql_root_password
 
   webserver:
-    image: <$DTR_HOST>/frontend/java_web:2
+    image: <$DTR_HOST>/frontend/java_web:3
+    deploy:
+      mode: replicated
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints: [node.role == worker]
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 786M
+        reservations:
+          cpus: '0.5'
+          memory: 512M 
+      update_config:
+        parallelism: 2
+        delay: 10s
+#        order: stop-first
     ports:
       - "8080:8080"
     environment:
@@ -23,40 +60,72 @@ services:
       - front-tier
       - back-tier
 
-  signup_client:
-    image:  <$DTR_HOST>/frontend/signup_client
-    ports:
-      - "8000:80"
-    environment:
-      BASEURI: http://messageservice:8090/user
-    networks: 
-      - front-tier
-      - back-tier
-
   messageservice:
     image: <$DTR_HOST>/backend/messageservice
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints: [node.role == worker]  
     ports:
       - "8090:8090"
     networks:
       - back-tier
 
   worker:
-    image: <$DTR_HOST>/backend/worker:1
+    image: <$DTR_HOST>/backend/worker:2
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints: [node.role == worker]
     networks:
       - back-tier
+      - front-tier
 
   redis:
     image: redis
-    ports: 
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints: [node.role == worker]      
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+      update_config:
+        parallelism: 2
+        delay: 10s
+#        order: stop-first
+    ports:
       - "6379:6379"
     networks:
       - back-tier
 
 networks:
   front-tier:
-    external : true
+    external: true
   back-tier:
-    external : true
+    external: true
 
 secrets:
   mysql_root_password:
