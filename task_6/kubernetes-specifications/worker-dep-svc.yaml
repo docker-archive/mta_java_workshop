@@ -22,7 +22,7 @@ spec:
         com.docker.stack.namespace: java-web-5
     spec:
       containers:
-      - image: spara/worker:1
+      - image: <$DTR_HOST>/backend/worker:1
         name: worker
 ---
 apiVersion: v1

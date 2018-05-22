@@ -25,7 +25,7 @@ spec:
       - env:
         - name: MYSQL_ROOT_PASSWORD
           value: password
-        image: spara/database
+        image: <$DTR_HOST>/backend/database
         imagePullPolicy: IfNotPresent
         name: database
         ports:

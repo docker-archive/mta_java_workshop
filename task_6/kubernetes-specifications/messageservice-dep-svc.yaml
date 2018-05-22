@@ -22,7 +22,7 @@ spec:
         com.docker.stack.namespace: java-web-5
     spec:
       containers:
-      - image: spara/messageservice
+      - image: <$DTR_HOST>/backend/messageservice
         imagePullPolicy: IfNotPresent
         name: messageservice
         ports:

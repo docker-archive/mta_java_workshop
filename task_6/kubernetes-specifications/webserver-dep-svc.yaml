@@ -25,7 +25,7 @@ spec:
       - env:
         - name: BASEURI
           value: http://messageservice:8090/user
-        image: spara/java_web:2
+        image: <$DTR_HOST>/frontend/java_web:2
         imagePullPolicy: IfNotPresent
         name: webserver
         ports:

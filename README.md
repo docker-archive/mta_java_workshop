@@ -1063,25 +1063,31 @@ In your browser, go to http://<$UCP_HOST>:3000 to see the containers and how the
 
 Docker EE gives you the choice of which orchestrator that you want to use. The same application that you deployed in Docker Swarm can be deployed in Kubernetes using a Docker Compose file or with Kubernetes manifests.
 
-### <a name="task6.1></a>Task 6.1: Configure Terminal
+### <a name="task6.1"></a>Task 6.1: Configure Terminal
 
 Kubernetes is an API and to connect to the API we will need to configure the terminal to connect. This is done with a client bundle which contains the certificates to authenticate against the Kubernetes API.
 
 We can download the client bundle from UCP by downloading an authentication token.
 
 ```bash
+$ UCP_HOST=${1:<$UCP_HOST>}
 $ ADMIN_USER=${2:-admin}
 $ ADMIN_PASS=${3:-admin1234}
 $ PAYLOAD="{\"username\": \"admin\", \"password\": \"admin1234\"}"
 $ echo $PAYLOAD
+{"username": "admin", "password": "admin1234"}
 $ TOKEN=$(curl --insecure  -d "$PAYLOAD" -X POST https://"$UCP_HOST"/auth/login  | jq -r ".auth_token")
+% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   100  100    54  100    46    102     87 --:--:-- --:--:-- --:--:--   103
 $ echo $TOKEN
+211845cb-7751-4582-b880-f59252f61e18
 ``` 
 
 Once we have a token, we can use it to get a client bundle and use it to configure the environment.
 
 ```bash
-$ curl -k -s -H Authorization: Bearer "$TOKEN}" https://"$UCP_HOST"/api/clientbundle > /tmp/bundle.zip
+$ curl -k -H "Authorization: Bearer $TOKEN" https://"$UCP_HOST"/api/clientbundle > /tmp/bundle.zip
 $ mkdir /tmp/certs-$TOKEN
 $ pushd /tmp/certs-$TOKEN
 $ unzip /tmp/bundle.zip
@@ -1096,7 +1102,7 @@ Test that the kubectl can connect to kubernetes.
 $ kubectl get all
 ```  
 
-### <a name="task6.2></a>Task 6.2: Deploy Application in Kubernetes
+### <a name="task6.2"></a>Task 6.2: Deploy Application in Kubernetes
 
 It's beyond the scope of this tutorial to cover kubernetes indepth. However, if you're unfamiliar with kubernetes, here are some basic concepts.
 
@@ -1106,14 +1112,35 @@ Kubernetes uses abstractions to represent containerized workloads and their depl
 
 Beyond basic objects, such as pods and services, is a higher level of abstraction called `controllers` that build on the basic objects to add functions and convenience features. A `replicaset` is a controller that creates and destroys pods dynamically. Another controller and higher level of abstraction is a `deployment` which provides the declarative updates for `pods` and `replicasets`. Deployments describe the desired end state of an application.
 
-To run the application on Kubernetes, each part (webserver, database, messageservice, worker and redis) has been defined as a service and deployment. For each component, there's a specification that contains both the service and deployment 
+To run the application on Kubernetes, each part (webserver, database, messageservice, worker and redis) has been defined as a service and deployment. For each component, there's a specification that contains both the service and deployment that can be uploaded from the cloned repository.
 
+1. Click on `Kubernetes` on the side bar menu and click `Create`
 
-![](example images of deploying to Kubernetes)
+![](images/kubernetes.png)
 
+2. Select `default` for Namespace. Click on the `Click to upload a .yml file' to upload a file from your computer.
 
+![](images/kubernetes_create.png)
 
-###  <a name="task6.3></a>Task 6.3: Check out the Deployment on the Command Line
+3. When the service is running, you can see the `Controllers` which include the `deployment` and `replicaset`
+
+![](images/kubernetes_controllers.png)
+
+and the pods
+
+![](images/kubernetes_pods.png)
+
+4. Repeat this step for webserver, messageservice, worker and redis components.
+
+![](images/kubernetes_all_services.png)
+
+5. To see the application running, click on `Load Balancers` on the left side menu, click on `webserver` to display the webserver panel. Under `Ports` you'll see the URL for the application. Click on the link and add `java-web` to the url to get to the application.
+
+![](images/kubernetes_loadbalancers.png)
+
+Note that the port number is different from the common port 8080 used by Tomcat. The webserver spec uses Kubernetes' `NodePort` publishing service which uses a predefined range of ports such as 35080. To use a different IP address or port outside the the range defined by nodePort, we can configure a pod as a proxy.
+
+###  <a name="task6.3"></a>Task 6.3: Check out the Deployment on the Command Line
 
 1. Go to the terminal window.
 
@@ -1122,26 +1149,31 @@ To run the application on Kubernetes, each part (webserver, database, messageser
 ```bash
 $ kubectl get all
 ```
+![](images/kubectl_get_all.gif)
 
 3. View info on pods
 
 ```bash
 $ kubectl get pods
 ```
+![](images/kubectl_get_pods.png)
 
-4. View info on loadbalancers
+4. View info on services
 
 ```bash
-$ kubectl get lbs
+$ kubectl get services
 ```
 
-###  <a name="task6.3></a>Task 6.3: Check out the Deployment using UCP
+![](images/kubectl_get_services.png)
 
-1. View pods
+5. View info on deployments
 
-2. View services
+```bash
+$ kubectl get deployments
+```
 
-3. View loadbalancers
+![](images/kubectl_get_deployments.png)
+
 
 ## Conclusion
 
