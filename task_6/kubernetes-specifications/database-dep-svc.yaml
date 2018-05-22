@@ -1,0 +1,54 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    com.docker.service.id: java-web-5-database
+    com.docker.service.name: database
+    com.docker.stack.namespace: java-web-5
+  name: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      com.docker.service.id: java-web-5-database
+      com.docker.service.name: database
+      com.docker.stack.namespace: java-web-5
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        com.docker.service.id: java-web-5-database
+        com.docker.service.name: database
+        com.docker.stack.namespace: java-web-5
+    spec:
+      containers:
+      - env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: password
+        image: spara/database
+        imagePullPolicy: IfNotPresent
+        name: database
+        ports:
+        - containerPort: 3306
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    com.docker.service.id: java-web-5-database
+    com.docker.service.name: database
+    com.docker.stack.namespace: java-web-5
+  name: database
+  namespace: default
+spec:
+  clusterIP: None
+  ports:
+  - name: database
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    com.docker.service.id: java-web-5-database
+    com.docker.service.name: database
+    com.docker.stack.namespace: java-web-5

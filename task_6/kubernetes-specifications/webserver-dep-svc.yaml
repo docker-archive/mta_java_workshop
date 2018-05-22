@@ -1,0 +1,58 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    com.docker.service.id: java-web-5-webserver
+    com.docker.service.name: webserver
+    com.docker.stack.namespace: java-web-5
+  name: webserver
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      com.docker.service.id: java-web-5-webserver
+      com.docker.service.name: webserver
+      com.docker.stack.namespace: java-web-5
+  template:
+    metadata:
+      labels:
+        com.docker.service.id: java-web-5-webserver
+        com.docker.service.name: webserver
+        com.docker.stack.namespace: java-web-5
+    spec:
+      containers:
+      - env:
+        - name: BASEURI
+          value: http://messageservice:8090/user
+        image: spara/java_web:2
+        imagePullPolicy: IfNotPresent
+        name: webserver
+        ports:
+          - containerPort: 8080
+            protocol: TCP
+            name: webserver
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    com.docker.service.id: java-web-5-webserver
+    com.docker.service.name: webserver
+    com.docker.stack.namespace: java-web-5
+  name: webserver
+  selfLink: /api/v1/namespaces/default/services/webserver
+spec:
+  ports:
+  - name: webserver
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+    nodePort: 35080
+  selector:
+    com.docker.service.id: java-web-5-webserver
+    com.docker.service.name: webserver
+    com.docker.stack.namespace: java-web-5
+  sessionAffinity: None
+  type: NodePort

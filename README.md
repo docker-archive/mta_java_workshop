@@ -823,7 +823,6 @@ In this section, we added logging and visualization capabilities with only a min
 
 In Task 2 we modernized the java applicatio by adding microservices that will allow it to scale. This section we'll discuss the process of scaling the application to handle more requests.
 
-
 ### Number of Managers
 
 The recommended number of managers for a production cluster is 3 or 5. A 3-manager cluster can tolerate the loss of one manager, and a 5-manager cluster can tolerate two instantaneous manager failures. Clusters with more managers can tolerate more manager failures, but adding more managers also increases the overhead of maintaining and committing cluster state in the Docker Swarm Raft quorum. In some circumstances, clusters with more managers (for example 5 or 7) may be slower (in terms of cluster-update latency and throughput) than a cluster with 3 managers and otherwise similar specs.
@@ -848,7 +847,7 @@ Click on `Scheduler` and under `Container Scheduling` uncheck the first option `
 
 ## <a name="task5.2"></a>Task 5.2: Configuring Containers for Deployment
 
-We'll use the Redis container as example on how to configure containers for production.
+We'll use the Redis container as example on how to configure containers for production and go through the options.
 
 ```yaml
   redis:
@@ -873,7 +872,6 @@ We'll use the Redis container as example on how to configure containers for prod
     update_config:
           parallelism: 2
           delay: 10s
-          order: stop-first
     ports:
       - "6379:6379"
     networks:
@@ -951,7 +949,7 @@ services:
       - mysql_root_password
 
   webserver:
-    image: <$DTR_HOST>/frontend/java_web:3
+    image: <$DTR_HOST>/frontend/java_web:2
     deploy:
       mode: replicated
       replicas: 2
@@ -1063,102 +1061,59 @@ In your browser, go to http://<$UCP_HOST>:3000 to see the containers and how the
 
 ## <a name="task6"></a>Task 6: Deploying in Kubernetes
 
-Docker EE gives you the choice of which orchestrator that you want to choose. The same application that you deployed in Docker Swarm can be deployed in Kubernetes using a Docker Compose file or with Kubernetes manifests.
+Docker EE gives you the choice of which orchestrator that you want to use. The same application that you deployed in Docker Swarm can be deployed in Kubernetes using a Docker Compose file or with Kubernetes manifests.
 
-### <a name="task6.1></a>Task 6.1: Delete the Stack
+### <a name="task6.1></a>Task 6.1: Configure Terminal
 
-Delete the application stack you deployed in Docker Swarm
+Kubernetes is an API and to connect to the API we will need to configure the terminal to connect. This is done with a client bundle which contains the certificates to authenticate against the Kubernetes API.
 
-![](example images deleting stack)
+We can download the client bundle from UCP by downloading an authentication token.
 
-### <a name="task6.1></a>Task 6.1: Deploy Application in Kubernetes with a Compose File
+```bash
+$ ADMIN_USER=${2:-admin}
+$ ADMIN_PASS=${3:-admin1234}
+$ PAYLOAD="{\"username\": \"admin\", \"password\": \"admin1234\"}"
+$ echo $PAYLOAD
+$ TOKEN=$(curl --insecure  -d "$PAYLOAD" -X POST https://"$UCP_HOST"/auth/login  | jq -r ".auth_token")
+$ echo $TOKEN
+``` 
 
-Deploy the application in Kubernetes using a Docker Compose file.
+Once we have a token, we can use it to get a client bundle and use it to configure the environment.
+
+```bash
+$ curl -k -s -H Authorization: Bearer "$TOKEN}" https://"$UCP_HOST"/api/clientbundle > /tmp/bundle.zip
+$ mkdir /tmp/certs-$TOKEN
+$ pushd /tmp/certs-$TOKEN
+$ unzip /tmp/bundle.zip
+$ rm /tmp/bundle.zip
+$ source /tmp/certs-$TOKEN/env.sh
+$ popd
+```
+
+Test that the kubectl can connect to kubernetes.
+
+```bash
+$ kubectl get all
+```  
+
+### <a name="task6.2></a>Task 6.2: Deploy Application in Kubernetes
+
+It's beyond the scope of this tutorial to cover kubernetes indepth. However, if you're unfamiliar with kubernetes, here are some basic concepts.
+
+Kubernetes uses abstractions to represent containerized workloads and their deployment. These abstractions are represented by objects and two of the basic objects are `pods` and `services`.
+
+`Pods` are a single unit of deployment or a single application in kubernetes that may have or more containers. Pods are mortal which means that when they are destroyed they do not return. This means that pods do not have a stable IP. In order for a deployment that uses multiple pods that rely on each other, Kubernetes has `services` which defines a set of pods and a policy that defines how they are available.
+
+Beyond basic objects, such as pods and services, is a higher level of abstraction called `controllers` that build on the basic objects to add functions and convenience features. A `replicaset` is a controller that creates and destroys pods dynamically. Another controller and higher level of abstraction is a `deployment` which provides the declarative updates for `pods` and `replicasets`. Deployments describe the desired end state of an application.
+
+To run the application on Kubernetes, each part (webserver, database, messageservice, worker and redis) has been defined as a service and deployment. For each component, there's a specification that contains both the service and deployment 
+
 
 ![](example images of deploying to Kubernetes)
 
-Copy the Compose file below to deploy the application.
 
-```yaml
-version: "3.3"
 
-services:
-
-  database:
-    image: <$DTR_HOST>/backend/database
-    environment:
-      MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
-    ports:
-      - "3306:3306"
-    networks:
-      - back-tier
-    secrets:
-      - mysql_root_password
-
-  webserver:
-    image: <$DTR_HOST>/backend/java_web:2
-    ports:
-      - "8080:8080"
-    environment:
-      BASEURI: http://messageservice:8090/users
-    networks:
-      - front-tier
-      - back-tier
-
-  messageservice:
-    image: <$DTR_HOST>/backend/messageservice
-    ports:
-      - "8090:8090"
-    networks:
-      - back-tier
-
-  worker:
-    image: <$DTR_HOST>/backend/worker
-    networks:
-      - back-tier
-
-  redis:
-    image: redis
-    container_name: redis
-    ports: 
-      - "6379:6379"
-    networks:
-      - back-tier
-
-#logging
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.1.2
-    container_name: elasticsearch
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    environment:
-      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-    networks: 
-      - elk
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana-oss:6.1.2
-    container_name: kibana
-    ports:
-      - "5601:5601"
-    networks: 
-      - elk
-    depends_on:
-      - elasticsearch
-
-networks:
-  front-tier:
-    external: true
-  back-tier:
-    external: true
-
-secrets:
-  mysql_root_password:
-    external: true
-```
-
-###  <a name="task6.2></a>Task 6.2: Check out the Deployment on the Command Line
+###  <a name="task6.3></a>Task 6.3: Check out the Deployment on the Command Line
 
 1. Go to the terminal window.
 

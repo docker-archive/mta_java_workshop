@@ -1,0 +1,49 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    com.docker.service.id: java-web-5-worker
+    com.docker.service.name: worker
+    com.docker.stack.namespace: java-web-5
+  name: worker
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      com.docker.service.id: java-web-5-worker
+      com.docker.service.name: worker
+      com.docker.stack.namespace: java-web-5
+  template:
+    metadata:
+      labels:
+        com.docker.service.id: java-web-5-worker
+        com.docker.service.name: worker
+        com.docker.stack.namespace: java-web-5
+    spec:
+      containers:
+      - image: spara/worker:1
+        name: worker
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    com.docker.service.id: java-web-5-worker
+    com.docker.service.name: worker
+    com.docker.stack.namespace: java-web-5
+  name: worker
+  namespace: default
+spec:
+  clusterIP: None
+  ports:
+    - 
+      name: worker
+      port: 55555
+      protocol: TCP
+      targetPort: 55555
+  selector:
+    com.docker.service.id: java-web-5-worker
+    com.docker.service.name: worker
+    com.docker.stack.namespace: java-web-5
+  type: ClusterIP

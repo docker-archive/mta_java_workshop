@@ -1,0 +1,269 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    com.docker.service.id: java-web-5-database
+    com.docker.service.name: database
+    com.docker.stack.namespace: java-web-5
+  name: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      com.docker.service.id: java-web-5-database
+      com.docker.service.name: database
+      com.docker.stack.namespace: java-web-5
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        com.docker.service.id: java-web-5-database
+        com.docker.service.name: database
+        com.docker.stack.namespace: java-web-5
+    spec:
+      containers:
+      - env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: password
+        image: spara/database
+        imagePullPolicy: IfNotPresent
+        name: database
+        ports:
+        - containerPort: 3306
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    com.docker.service.id: java-web-5-database
+    com.docker.service.name: database
+    com.docker.stack.namespace: java-web-5
+  name: database
+  namespace: default
+spec:
+  clusterIP: None
+  ports:
+  - name: database
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    com.docker.service.id: java-web-5-database
+    com.docker.service.name: database
+    com.docker.stack.namespace: java-web-5
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    com.docker.service.id: java-web-5-webserver
+    com.docker.service.name: webserver
+    com.docker.stack.namespace: java-web-5
+  name: webserver
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      com.docker.service.id: java-web-5-webserver
+      com.docker.service.name: webserver
+      com.docker.stack.namespace: java-web-5
+  template:
+    metadata:
+      labels:
+        com.docker.service.id: java-web-5-webserver
+        com.docker.service.name: webserver
+        com.docker.stack.namespace: java-web-5
+    spec:
+      containers:
+        - env:
+          - name: BASEURI
+            value: http://messageservice:8090/user
+        image: spara/java_web:2
+        imagePullPolicy: IfNotPresent
+        name: webserver
+        ports:
+          - containerPort: 8080
+            protocol: TCP
+            name: webserver
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    com.docker.service.id: java-web-5-webserver
+    com.docker.service.name: webserver
+    com.docker.stack.namespace: java-web-5
+  name: webserver
+  namespace: default
+spec:
+  clusterIP: None
+  ports:
+    - 
+      name: webserver
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    com.docker.service.id: java-web-5-webserver
+    com.docker.service.name: webserver
+    com.docker.stack.namespace: java-web-5
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    com.docker.service.id: java-web-5-messageservice
+    com.docker.service.name: messageservice
+    com.docker.stack.namespace: java-web-5
+  name: messageservice
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      com.docker.service.id: java-web-5-messageservice
+      com.docker.service.name: messageservice
+      com.docker.stack.namespace: java-web-5
+  template:
+    metadata:
+      labels:
+        com.docker.service.id: java-web-5-messageservice
+        com.docker.service.name: messageservice
+        com.docker.stack.namespace: java-web-5
+    spec:
+      containers:
+        - image: spara/messageservice
+          imagePullPolicy: IfNotPresent
+          name: messageservice
+          ports:
+            - containerPort: 8090
+              protocol: TCP
+              name: messageservice
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    com.docker.service.id: java-web-5-messageservice
+    com.docker.service.name: messageservice
+    com.docker.stack.namespace: java-web-5
+  name: messageservice
+  namespace: default
+spec:
+  clusterIP: None
+  ports: 
+    - 
+      name: messageservice
+      port: 8090
+      protocol: TCP
+      targetPort: 8090
+  selector:
+    com.docker.service.id: java-web-5-messageservice
+    com.docker.service.name: messageservice
+    com.docker.stack.namespace: java-web-5
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    com.docker.service.id: java-web-5-worker
+    com.docker.service.name: worker
+    com.docker.stack.namespace: java-web-5
+  name: worker
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      com.docker.service.id: java-web-5-worker
+      com.docker.service.name: worker
+      com.docker.stack.namespace: java-web-5
+  template:
+    metadata:
+      labels:
+        com.docker.service.id: java-web-5-worker
+        com.docker.service.name: worker
+        com.docker.stack.namespace: java-web-5
+    spec:
+      containers:
+        - image: spara/worker:1
+          name: worker
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    com.docker.service.id: java-web-5-worker
+    com.docker.service.name: worker
+    com.docker.stack.namespace: java-web-5
+  name: worker
+  namespace: default
+spec:
+  clusterIP: None
+  ports:
+    - 
+      name: worker
+      port: 55555
+      protocol: TCP
+      targetPort: 55555
+  selector:
+    com.docker.service.id: java-web-5-worker
+    com.docker.service.name: worker
+    com.docker.stack.namespace: java-web-5
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    com.docker.service.id: java-web-5-redis
+    com.docker.service.name: redis
+    com.docker.stack.namespace: java-web-5
+  name: redis
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      com.docker.service.id: java-web-5-redis
+      com.docker.service.name: redis
+      com.docker.stack.namespace: java-web-5
+  template:
+    metadata:
+      labels:
+        com.docker.service.id: java-web-5-redis
+        com.docker.service.name: redis
+        com.docker.stack.namespace: java-web-5
+    spec:
+      containers:
+        - image: redis
+          imagePullPolicy: IfNotPresent
+          name: redis
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    com.docker.service.id: java-web-5-redis
+    com.docker.service.name: redis
+    com.docker.stack.namespace: java-web-5
+  name: redis
+  namespace: default
+spec:
+  clusterIP: None
+  ports:
+  - name: redis
+    port: 55555
+    protocol: TCP
+    targetPort: 55555
+  selector:
+    com.docker.service.id: java-web-5-redis
+    com.docker.service.name: redis
+    com.docker.stack.namespace: java-web-5
+  sessionAffinity: None
+  type: ClusterIP

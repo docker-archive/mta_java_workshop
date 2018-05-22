@@ -1,0 +1,54 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    com.docker.service.id: java-web-5-redis
+    com.docker.service.name: redis
+    com.docker.stack.namespace: java-web-5
+  name: redis
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      com.docker.service.id: java-web-5-redis
+      com.docker.service.name: redis
+      com.docker.stack.namespace: java-web-5
+  template:
+    metadata:
+      labels:
+        com.docker.service.id: java-web-5-redis
+        com.docker.service.name: redis
+        com.docker.stack.namespace: java-web-5
+    spec:
+      containers:
+      - image: redis
+        imagePullPolicy: IfNotPresent
+        name: redis
+        ports:
+          - containerPort: 6379
+            protocol: TCP
+            name: redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    com.docker.service.id: java-web-5-redis
+    com.docker.service.name: redis
+    com.docker.stack.namespace: java-web-5
+  name: redis
+  namespace: default
+spec:
+  clusterIP: None
+  ports:
+  - name: redis
+    port: 55555
+    protocol: TCP
+    targetPort: 55555
+  selector:
+    com.docker.service.id: java-web-5-redis
+    com.docker.service.name: redis
+    com.docker.stack.namespace: java-web-5
+  sessionAffinity: None
+  type: ClusterIP

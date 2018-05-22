@@ -1,0 +1,53 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    com.docker.service.id: java-web-5-messageservice
+    com.docker.service.name: messageservice
+    com.docker.stack.namespace: java-web-5
+  name: messageservice
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      com.docker.service.id: java-web-5-messageservice
+      com.docker.service.name: messageservice
+      com.docker.stack.namespace: java-web-5
+  template:
+    metadata:
+      labels:
+        com.docker.service.id: java-web-5-messageservice
+        com.docker.service.name: messageservice
+        com.docker.stack.namespace: java-web-5
+    spec:
+      containers:
+      - image: spara/messageservice
+        imagePullPolicy: IfNotPresent
+        name: messageservice
+        ports:
+          - containerPort: 8090
+            protocol: TCP
+            name: messageservice
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    com.docker.service.id: java-web-5-messageservice
+    com.docker.service.name: messageservice
+    com.docker.stack.namespace: java-web-5
+  name: messageservice
+  namespace: default
+spec:
+  clusterIP: None
+  ports: 
+    - 
+      name: messageservice
+      port: 8090
+      protocol: TCP
+      targetPort: 8090
+  selector:
+    com.docker.service.id: java-web-5-messageservice
+    com.docker.service.name: messageservice
+    com.docker.stack.namespace: java-web-5
