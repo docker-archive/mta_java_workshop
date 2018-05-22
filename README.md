@@ -28,7 +28,7 @@ In this lab we'll use a Docker EE cluster. We'll initially deploy both a Java n-
 > * [Task 3: Modernizing with Microservices](#task3)
 >   * [Task 3.1: Building the Microservices Images](#task3.1)
 >   * [Task 3.2: Push to DTR](#task3.2)
->   * [Task 3.3: Run the Application in UPC](#task3.3)
+>   * [Task 3.3: Run the Application in UCP](#task3.3)
 > * [Task 4: Adding Logging and Monitoring](#task4)
 >   * [Task 4.1: Add Data](#task4.1)
 >   * [Task 4.2: Display Data on Kibana](#task4.2)
@@ -586,7 +586,7 @@ $ docker image build -t $DTR_HOST/backend/java_web:2 .
 	$ docker push $DTR_HOST/frontend/java_web:2
 ```
 
-## <a name="task3.3"></a>Task 3.3: Run the Application in UPC
+## <a name="task3.3"></a>Task 3.3: Run the Application in UCP
 
 Adding microservices adds complexity to deployment and maintenance when compared to a monolithic application comprised of only a application server and a database. But we’ll use Docker to easily deploy, manage and maintain these additional services. One component that's not in DTR is Redis, a Dockerfile is not needed because we'll use official Redis image without any additional configuration.
 
@@ -1058,6 +1058,7 @@ docker run -it -d -p 3000:8080 -v /var/run/docker.sock:/var/run/docker.sock dock
 
 In your browser, go to http://<$UCP_HOST>:3000 to see the containers and how they are distributed across the cluster.
 
+![](images/visualizer.png)
 
 ## <a name="task6"></a>Task 6: Deploying in Kubernetes
 
