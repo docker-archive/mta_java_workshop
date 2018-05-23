@@ -1066,21 +1066,27 @@ Docker EE gives you the choice of which orchestrator that you want to use. The s
 
 ### <a name="task6.1"></a>Task 6.1: Configure Terminal
 
-Kubernetes is an API and to connect to the API we will need to configure the terminal to connect. This is done with a client bundle which contains the certificates to authenticate against the Kubernetes API.
+Kubernetes is an API and to connect to the API using the command line we will need to configure the terminal. This is done with a client bundle which contains the certificates to authenticate against the Kubernetes API.
 
-We can download the client bundle from UCP by downloading an authentication token.
+We can download the client bundle from UCP by requesting an authentication token.
 
 ```bash
 $ UCP_HOST=${1:<$UCP_HOST>}
+
 $ ADMIN_USER=${2:-admin}
+
 $ ADMIN_PASS=${3:-admin1234}
+
 $ PAYLOAD="{\"username\": \"admin\", \"password\": \"admin1234\"}"
+
 $ echo $PAYLOAD
 {"username": "admin", "password": "admin1234"}
+
 $ TOKEN=$(curl --insecure  -d "$PAYLOAD" -X POST https://"$UCP_HOST"/auth/login  | jq -r ".auth_token")
 % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100   100  100    54  100    46    102     87 --:--:-- --:--:-- --:--:--   103
+
 $ echo $TOKEN
 211845cb-7751-4582-b880-f59252f61e18
 ``` 
@@ -1089,11 +1095,17 @@ Once we have a token, we can use it to get a client bundle and use it to configu
 
 ```bash
 $ curl -k -H "Authorization: Bearer $TOKEN" https://"$UCP_HOST"/api/clientbundle > /tmp/bundle.zip
+
 $ mkdir /tmp/certs-$TOKEN
+
 $ pushd /tmp/certs-$TOKEN
+
 $ unzip /tmp/bundle.zip
+
 $ rm /tmp/bundle.zip
+
 $ source /tmp/certs-$TOKEN/env.sh
+
 $ popd
 ```
 
@@ -1101,6 +1113,8 @@ Test that the kubectl can connect to kubernetes.
 
 ```bash
 $ kubectl get all
+NAME             TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+svc/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   6h
 ```  
 
 ### <a name="task6.2"></a>Task 6.2: Deploy Application in Kubernetes
@@ -1194,12 +1208,18 @@ In the final section, we changed the orchestrator from Docker Swarm to Kubernete
 
 ### Modernization Workflow
 
-The modernization workflow is based on whether the application is
+The modernization workflow is based on whether the application is whether the application is at the end of life or if the application will continue on as a business process. If the application is at the end of life, containerizing the application components might be sufficient for maintenance. Minor changes and patches can be rolled in as needed until the application is no longer needed. Section 2 of this tutorial covered the process of containerizing an existing application.
 
+If the application is an ongoing business process, then piece wise modernization of the application is possible. Section 3 of this workshop covers how to take one aspect of an application and modernize the architecture. Section 4 covered how we can add new services because we extedend the architecture. Section 5 described how to configure an application for a production deployment using Swarm. The final section, showed how to deploy the same application using Kubernetes as an orchestrator. With Docker EE you have choice on how to deploy your application as well as environment to debug, monitor and manage your applications.
 
 ### Agility
 
+In this tutorial we saw how easy it was to convert typical N-Tier Java CRUD application to containers and run them as an application in Docker EE. Tools such as multi-stage builds, Docker files, Docker Trusted Registry and Docker compose simplified the process of build, ship and run. We could also reuse components such as the database when modernizing the application and we could incorporate new capabilities such as monitoring and visualization with minor changes to the application. Docker EE provides a comprehensive platform for building, modernizing and deploying applications on cloud infrastructure.
+
 ### Choice
+
+With Docker EE you have a choice. Whether your app is tied to a specific version of Java or you're building on the latest JVM, there are base images for application specific requirements. EE also supports Windows containers so you can run hybrid workloads to take advantage of both Windows and Linux applications. Docker EE supports both Docker Swarm and Kubernetes, you can pick the right solution for the application with out lock in.
+
 
 ## Call to Action
 
