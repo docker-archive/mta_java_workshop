@@ -18,8 +18,7 @@ In this lab we'll use a Docker EE cluster. We'll initially deploy both a Java n-
 
 > * [Task 1: Configure the Docker EE Cluster](#task1)
 >   * [Task 1.1: Accessing PWD](#task1.1)
->   * [Task 1.2: Install a Windows worker node](#task1.2)
->   * [Task 1.3: Create Five Repositories](#task1.3)
+>   * [Task 1.2: Create Four Repositories](#task1.2)
 > * [Task 2: Deploy a Java Web App with Universal Control Plane](#task2)
 >   * [Task 2.1: Clone the Demo Repo](#task2.1)
 >   * [Task 2.2: Building the Web App and Database Images](#task2.2)
@@ -102,7 +101,7 @@ The Play with Docker (PWD) environment is almost completely set up, but before w
 
 2. Fill out the form, and click `submit`. You will then be redirected to the PWD environment.
 
-	It may take a few minutes to provision out your PWD environment. After this step completes, you'll be ready to move on to task 1.2: Install a Windows worker node
+	It may take a few minutes to provision out your PWD environment.
 
 	> In a production environment you would use certs from a trusted certificate authority and would not see this screen.
 	>
@@ -115,7 +114,7 @@ The Play with Docker (PWD) environment is almost completely set up, but before w
 	> ![](./images/red_warning.png)
 
 
-### <a name="task1.3"></a>Task 1.3: Create Five DTR Repositories
+### <a name="task1.2"></a>Task 1.2: Create Four DTR Repositories
 
 Docker Trusted Registry is a special server designed to store and manage your Docker images. In this lab we're going to create five different Docker images, and push them to DTR. But before we can do that, we need to setup repositories in which those images will reside. Often that would be enough.
 
@@ -344,7 +343,7 @@ ENV MYSQL_PASSWORD=password
 	denied: requested access to the resource is denied
 	```
 
-	As you can see, the access control that you established in the [Task 1.3](#task1.3) prevented you from pushing to this repository.	
+	As you can see, the access control that you established in the [Task 1.2](#task1.2) prevented you from pushing to this repository.	2
 
 4. Now try logging in using `frontend_user`, and then use `docker push` to upload your image up to Docker Trusted Registry.
 
@@ -437,10 +436,10 @@ In this section, the java_web application is pulled from DTR and named the servi
 
 ```yaml
     networks:
-	  back-tier:
-	    external: true
-	  front-tier:
-	    external: true
+    back-tier:
+      external: true
+    front-tier:
+      external: true
 ```
 
 In this section, two networks are defined, the back-tier network isolates backend components from components on the front-tier network. This seems unnecessary in this current configuration but we'll make use of the networks in later iterations.
