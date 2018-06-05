@@ -18,7 +18,7 @@ In this lab we'll use a Docker EE cluster. We'll initially deploy both a Java n-
 
 > * [Task 1: Configure the Docker EE Cluster](#task1)
 >   * [Task 1.1: Accessing PWD](#task1.1)
->   * [Task 1.2: Create Four Repositories](#task1.2)
+>   * [Task 1.2: Docker Trusted Registry and Role Based Access Control](#task1.2)
 > * [Task 2: Deploy a Java Web App with Universal Control Plane](#task2)
 >   * [Task 2.1: Clone the Demo Repo](#task2.1)
 >   * [Task 2.2: Building the Web App and Database Images](#task2.2)
@@ -89,7 +89,7 @@ Swarm mode uses managers and workers to run your applications. Managers run the 
 
 #### <a name="intro2.2"></a>Overview of Kubernetes
 
-Kubernetes is available in Docker EE 2.0 and included in this workshop. Kubernetes deployments tend to be more complex than Docker Swarm, and there are many component types. UCP simplifies a lot of that, relying on Docker Swarm to handle shared resources. We'll concentrate on Pods and Load Balancers in this workshop, but there's plenty more supported by UCP 2.0.
+Kubernetes is available in Docker EE 2.0 and included in this workshop. Kubernetes deployments tend to be more complex than Docker Swarm, and there are many component types. UCP simplifies a lot of that, relying on Docker Swarm to handle shared resources. We'll concentrate on Services and Deployments in this workshop, but there's plenty more supported by UCP 2.0.
 
 ## <a name="task1"></a>Task 1: Configure the Docker EE Cluster
 
@@ -114,7 +114,7 @@ The Play with Docker (PWD) environment is almost completely set up, but before w
 	> ![](./images/red_warning.png)
 
 
-### <a name="task1.2"></a>Task 1.2: Create Four DTR Repositories
+### <a name="task1.2"></a>Task 1.2: Docker Trusted Registry and Role Based Access Control
 
 Docker Trusted Registry is a special server designed to store and manage your Docker images. In this lab we're going to create five different Docker images, and push them to DTR. But before we can do that, we need to setup repositories in which those images will reside. Often that would be enough.
 
