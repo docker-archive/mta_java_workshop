@@ -1,4 +1,4 @@
-# MTA for Java Workshop 
+# MTA for Java Workshop
 
 Docker EE 2.0 is the first Containers-as-a-Service platform to offer production-level support for the integrated management and security of both Linux and Windows Server Containers. It is also the first platform to support both Docker Swarm and Kubernetes orchestration.
 
@@ -44,7 +44,7 @@ This workshop is only available to people in a pre-arranged workshop. That may h
 
 If none of these apply to you, contact your local [Docker Meetup Chapter](https://events.docker.com/chapters/) and ask if there are any scheduled workshops. In the meantime, you may be interested in the labs available through the [Play with Docker Classroom](training.play-with-docker.com).
 
-There are three main components to the Play With Docker (PWD) interface. 
+There are three main components to the Play With Docker (PWD) interface.
 
 ### 1. Console Access
 Play with Docker provides access to the 3 Docker EE hosts in your Cluster. These machines are:
@@ -77,7 +77,7 @@ Docker EE provides an integrated, tested and certified platform for apps running
 
 ### <a name="intro2"></a>Overview of Orchestration
 
-While it is easy to run an application in isolation on a single machine, orchestration allows you to coordinate multiple machines to manage an application, with features like replication, encryption, loadbalancing, service discovery and more. If you've read anything about Docker, you have probably heard of Kubernetes and Docker swarm mode. Docker EE allows you to use either Docker Swarm mode or Kubernetes for orchestration. 
+While it is easy to run an application in isolation on a single machine, orchestration allows you to coordinate multiple machines to manage an application, with features like replication, encryption, loadbalancing, service discovery and more. If you've read anything about Docker, you have probably heard of Kubernetes and Docker swarm mode. Docker EE allows you to use either Docker Swarm mode or Kubernetes for orchestration.
 
 Both Docker Swarm mode and Kubernetes are declarative: you declare your cluster's desired state, and applications you want to run and where, networks, and resources they can use. Docker EE simplifies this by taking common concepts and moving them to the a shared resource.
 
@@ -107,7 +107,9 @@ The Play with Docker (PWD) environment is almost completely set up, but before w
 	>
 	> ![](./images/ssl_error.png)
 
-2. When prompted enter your username and password (these can be found below the console window in the main PWD screen). The UCP web interface should load up in your web browser.
+3. Click the `UCP` button on the left side of the screen.
+
+4. When prompted enter your username and password (these can be found below the console window in the main PWD screen). The UCP web interface should load up in your web browser.
 
 	> **Note**: Once the main UCP screen loads you'll notice there is a red warning bar displayed at the top of the UCP screen, this is an artifact of running in a lab environment. A UCP server configured for a production environment would not display this warning
 	>
@@ -146,31 +148,31 @@ However, before we create the repositories, we do want to restrict access to the
 
 	![](./images/two_organizations.png)
 
-6. Now you get to add a repository! Click on the `frontend` organization, select repositories and then Add repository
+6. Now you get to add a repository! Click on the `frontend` organization, select repositories and then `Add repository`.
 
 	![](./images/add_repository_frontend.png)
 
-7. Name the repository `java_web`.
+7. Name the repository `java_web` and, optionally, enter a description.  When finished, press `Save`.
 
 	![](./images/create_repository.png)
 
 	> Note the repository is listed as "Public" but that means it is publicly viewable by users of DTR. It is not available to the general public.
 
-8. Now it's time to create a team so you can restrict access to who administers the images. Select the `frontend` organization and the members will show up. Press Add user and start typing in frontend. Select the `frontend_user` when it comes up.
+8. Now it's time to create a team so you can restrict access to who administers the images. Select the `frontend` organization `Members` tab and the members will show up. Press `Add user` and start typing in `frontend` into the existing user search field. Select the `frontend_user` when it comes up and click `Save`.
 
 	![](./images/add_frontend_user_to_organziation.png)
 
-9. Next select the `frontend` organization and press the `Team` button to create a `web` team.
+9. Next with the `frontend` organization still selected, press the `+` button next to `Team` and enter `web` in the team name field.  Click `Save`.
 
 	![](./images/team.png)
 
-10. Add the `frontend_user` user to the `web` team and click save.
+10. With the `web` team selected, click `Add user` and add the `frontend_user` user like you just did for for the organization, clicking `Save` when done.
 
 	![](./images/team_add_user.png)
 
 	![](./images/team_with_user.png)
 
-11. Next select the `web` team and select the `Repositories` tab. Select `Add Existing repository` and choose the `java_web`repository. You'll see the `java` account is already selected. Then select `Read/Write` permissions so the `web` team has permissions to push images to this repository. Finally click `save`.
+11. With the `web` team sill selected, open the `Repositories` tab.  Click `New respository`, select `Add Existing repository` and choose the `java_web` repository. You'll see the `java` account is already selected. Then select `Read/Write` permissions so the `web` team has permissions to push images to this repository. Finally click `save`.
 
 	![](./images/add_java_web_to_team.png)
 
@@ -178,10 +180,10 @@ However, before we create the repositories, we do want to restrict access to the
 
 	![](./images/add_repository_signup_client.png)
 
-13. Repeat steps 4-11 above to create a `backend` organization with repositories called `database`, `messageservice` and `worker`. Create a team named `services` (with `backend_user` as a member). Grant `read/write` permissions for the `database`,`messageservice` and `worker` repositories to the `services` team.
+13. Repeat steps 6-11 above to create repositories called `database`, `messageservice` and `worker` under the `backend` organization. Create a team named `services` (with `backend_user` as a member). Grant `read/write` permissions for the `database`,`messageservice` and `worker` repositories to the `services` team.
 
 14. From the main DTR page, click Repositories, you will now see all three repositories listed.
-	
+
 	![](./images/five_repositories.png)
 
 15. (optional) If you want to check out security scanning in Task 5, you should turn on scanning now so DTR downloads the database of security vulnerabilities. In the left-hand panel, select `System` and then the `Security` tab. Select `ENABLE SCANNING` and `Online`.
@@ -191,7 +193,7 @@ However, before we create the repositories, we do want to restrict access to the
 Congratulations, you have created five new repositories in two new organizations, each with one team and a user each.
 
 ## <a name="task2"></a>Task 2: Deploy a Java Web App with Universal Control Plane
-Now that we've completely configured our cluster, let's deploy a couple of web apps. The first app is a basic Java CRUD (Create Read Update Delete) application in Tomcat that writes to a MySQL database. 
+Now that we've completely configured our cluster, let's deploy a couple of web apps. The first app is a basic Java CRUD (Create Read Update Delete) application in Tomcat that writes to a MySQL database.
 
 ### <a name="task2.1"></a> Task 2.1: Clone the Repository
 
@@ -248,7 +250,7 @@ With a Dockerfile, we'll perform a multi-stage where the code will be compiled a
 
 ```
 FROM maven:latest AS devenv
-WORKDIR /usr/src/signup 
+WORKDIR /usr/src/signup
 COPY app/pom.xml .
 RUN mvn -B -f pom.xml -s /usr/share/maven/ref/settings-docker.xml dependency:resolve
 COPY ./app .
@@ -315,7 +317,7 @@ ENV MYSQL_PASSWORD=password
 	There will be quite a bit of output. The Dockerfile describes a two-stage build. In the first stage, a Maven base image is used to build the Java app. But to run the app you don't need Maven or any of the JDK stuff that comes with it. So the second stage takes the output of the first stage and puts it in a much smaller Tomcat image.
 
 3. Log into your DTR server from the command line.
- 
+
 	First use the `backend_user`, which isn't part of the frontend organization
 
 	```bash
@@ -324,13 +326,13 @@ ENV MYSQL_PASSWORD=password
 	Password: <your password>
 	Login Succeeded
 	```
-	
+
 	Use `docker push` to upload your image up to Docker Trusted Registry.
-	
+
 	```bash
 	$ docker push $DTR_HOST/frontend/java_web
 	```
-	
+
 	> TODO: add output of failure to push
 
 	```bash
@@ -401,7 +403,7 @@ images
 
 Docker automates the process of building and running the application from a single file using Docker Compse. Compose is a tool for declaratively  defining and running multi-container Docker applications. With Compose, a YAML file configures the application’s services. Then, with a single command, all the services are configured, created and started.
 
-We'll go through the Compose [file](./part_2/docker-compose.yml) 
+We'll go through the Compose [file](./part_2/docker-compose.yml)
 
 ```yaml
     version: "3.3"
@@ -413,9 +415,9 @@ We'll go through the Compose [file](./part_2/docker-compose.yml)
         # set default mysql root password, change as needed
         environment:
           MYSQL_ROOT_PASSWORD: mysql_password
-        # Expose port 3306 to host. 
+        # Expose port 3306 to host.
         ports:
-          - "3306:3306" 
+          - "3306:3306"
         networks:
           - back-tier
 ```
@@ -426,7 +428,7 @@ In the section above, We pull the database container from DTR. We can also pass 
       webserver:
         image: <$DTR_HOST>/frontend/java_web
         ports:
-          - "8080:8080" 
+          - "8080:8080"
         networks:
           - front-tier
           - back-tier
@@ -482,9 +484,9 @@ services:
     # set default mysql root password, change as needed
     environment:
       MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
-    # Expose port 3306 to host. 
+    # Expose port 3306 to host.
     ports:
-      - "3306:3306" 
+      - "3306:3306"
     networks:
       - back-tier
     secrets:
@@ -493,7 +495,7 @@ services:
   webserver:
     image: <$DTR_HOST>/frontend/java_web:1
     ports:
-      - "8080:8080" 
+      - "8080:8080"
     networks:
       - front-tier
       - back-tier
@@ -630,7 +632,7 @@ services:
   redis:
     image: redis
     container_name: redis
-    ports: 
+    ports:
       - "6379:6379"
     networks:
       - back-tier
@@ -654,7 +656,7 @@ One of the advantages of splitting out a feature into a separate service is that
 
 We'll implement Elasticsearch and Kibana to collect and visualize data from the application. To gather the data for the reporting database in Elasticsearch, I’ve added code to the worker that listens to events published by the web application. The analytics worker receives the data and saves it in Elasticsearch which is running in Docker container. We're using Elasticsearch because it can be clustered across multiple containers for redundancy and it has Kibana, which is an excellent front-end for analytics.
 
-We're not making changes to the application or the registration microservice, so we can just add new services for Elasticsearch and Kibana in the Docker Compose file. One of the features of Docker is that Docker Compose can incrementally upgrade an application. 
+We're not making changes to the application or the registration microservice, so we can just add new services for Elasticsearch and Kibana in the Docker Compose file. One of the features of Docker is that Docker Compose can incrementally upgrade an application.
 
 ```
 #logging
@@ -666,7 +668,7 @@ We're not making changes to the application or the registration microservice, so
       - "9300:9300"
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-    networks: 
+    networks:
       - elk
 
   kibana:
@@ -674,7 +676,7 @@ We're not making changes to the application or the registration microservice, so
     container_name: kibana
     ports:
       - "5601:5601"
-    networks: 
+    networks:
       - elk
     depends_on:
       - elasticsearch
@@ -731,7 +733,7 @@ services:
 
   redis:
     image: redis
-    ports: 
+    ports:
       - "6379:6379"
     networks:
       - back-tier
@@ -744,14 +746,14 @@ services:
       - "9300:9300"
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-    networks: 
+    networks:
       - back-tier
 
   kibana:
     image: docker.elastic.co/kibana/kibana-oss:6.1.2
     ports:
       - "5601:5601"
-    networks: 
+    networks:
       - back-tier
       - front-tier
     depends_on:
@@ -790,7 +792,7 @@ We can also inspect the data by clicking on `Discover` in the left menu bar.
 
 ![](./images/kibana_discover.png)
 
-2. Create a visualization by clicking on `Visualize` in the left menu bar. 
+2. Create a visualization by clicking on `Visualize` in the left menu bar.
 
 ![](./images/kibana_visualize.png)
 
@@ -910,7 +912,7 @@ Restart_policy configures if and how to restart containers when they exit. resta
 
 * `condition`: One of none, on-failure or any (default: any).
 * `delay`: How long to wait between restart attempts, specified as a duration (default: 0).
-* `max_attempts`: How many times to attempt to restart a container before giving up (default: never give up). 
+* `max_attempts`: How many times to attempt to restart a container before giving up (default: never give up).
 * `window`: How long to wait before deciding if a restart has succeeded, specified as a duration (default: decide immediately).
 
 ### Update Config
@@ -922,7 +924,7 @@ Update_config configures how the service should be updated. Useful for configuri
 * `failure_action`: What to do if an update fails. One of continue, rollback, or pause (default: pause).
 * `monitor`: Duration after each task update to monitor for failure (ns|us|ms|s|m|h) (default 0s).
 * `max_failure_ratio`: Failure rate to tolerate during an update.
-* `order`: Order of operations during updates. One of stop-first (old task is stopped before starting new one), or start-first (new task is started first, and the running tasks briefly overlap) (default stop-first) 
+* `order`: Order of operations during updates. One of stop-first (old task is stopped before starting new one), or start-first (new task is started first, and the running tasks briefly overlap) (default stop-first)
 
 ## <a name="task5.3"></a>Task 5.3: Deploying in Production
 
@@ -1088,7 +1090,7 @@ $ TOKEN=$(curl --insecure  -d "$PAYLOAD" -X POST https://"$UCP_HOST"/auth/login 
 
 $ echo $TOKEN
 211845cb-7751-4582-b880-f59252f61e18
-``` 
+```
 
 Once we have a token, we can use it to get a client bundle and use it to configure the environment.
 
@@ -1195,7 +1197,7 @@ $ kubectl get deployments
 
 ### What we covered
 
-We started with basic N-Tier monolithic application composed of a Java application and a relational database. As a first step, we first deployed the application as-is to see how it would run in a containerized environment. 
+We started with basic N-Tier monolithic application composed of a Java application and a relational database. As a first step, we first deployed the application as-is to see how it would run in a containerized environment.
 
 The next step was to determine if any parts of the application could be refactored to make it more scalable. One factor that affects application performance is multiple writes to the database. To address this bottleneck, we implemented a message service that writes the user data to Redis, a key-value data store, to hold the data until a worker service writes it the the database. The messaging queue was implemented with REST interface and we modified the Java app to send the data to the message service.
 
