@@ -242,7 +242,7 @@ If you have git installed on your computer, cloning the repository to a local di
 
 ### <a name="task2.2"></a> Task 2.2: Building the Web App and Database Images
 
-As a first step, we'll containerize the application without changing existing code to test the concept of migrating the application to a container architecture. We'll do this by building the application from the source code and deploying it in the same application server used in production.  The code for containerizing the application can be found in the [part_2](./part_2) directory. Additionally, I'll configure and deploy the database.
+As a first step, we'll containerize the application without changing existing code to test the concept of migrating the application to a container architecture. We'll do this by building the application from the source code and deploying it in the same application server used in production.  The code for containerizing the application can be found in the [task_2](./task_2) directory. Additionally, I'll configure and deploy the database.
 
 Docker simplifies containerization with a Dockerfile, which is a text document that contains all the commands a user could call on the command line to assemble an image. Using `docker image build` users can create an automated build that executes several command-line instructions in succession.
 
@@ -301,7 +301,7 @@ ENV MYSQL_PASSWORD=password
 1. Change into the `java_app` directory.
 
 	```bash
-	$ cd ./part_2/java_app/
+	$ cd ./task_2/java_app/
 	```
 
 2. Use `docker build` to build your Docker image.
@@ -403,7 +403,7 @@ images
 
 Docker automates the process of building and running the application from a single file using Docker Compse. Compose is a tool for declaratively  defining and running multi-container Docker applications. With Compose, a YAML file configures the application’s services. Then, with a single command, all the services are configured, created and started.
 
-We'll go through the Compose [file](./part_2/docker-compose.yml)
+We'll go through the Compose [file](./task_2/docker-compose.yml)
 
 ```yaml
     version: "3.3"
@@ -527,13 +527,13 @@ One of the problems associated with Java CRUD applications is that database oper
 
  The message queue is implemented by adding a RESTful microservice that writes the user data to a Redis database that stores the information. If you’re not familiar with Redis, it’s an in memory key-value store that’s great for saving abstract data types such as JSON lists. Note that we could use any other key-value datastore in place of Redis, such as memcached or MongoDB.
 
-The [messageservice](./part_3/messageservice) uses the Spring Boot framework. Spring Boot was chosen because it has many advantages such as handling the database connections transparently, implementing both a MVC architecture and RESTful interfaces is simplified, and it includes a built-in application server in the form of Tomcat. Another factor in choosing Spring Boot is that it has good support for Redis.  We could continue to use Spring as in the original application, but all of these advantages simplifies configuration and deployment.
+The [messageservice](./task_3/messageservice) uses the Spring Boot framework. Spring Boot was chosen because it has many advantages such as handling the database connections transparently, implementing both a MVC architecture and RESTful interfaces is simplified, and it includes a built-in application server in the form of Tomcat. Another factor in choosing Spring Boot is that it has good support for Redis.  We could continue to use Spring as in the original application, but all of these advantages simplifies configuration and deployment.
 
 The message service is an MVC application that uses the same User entity model in the original application. It consists of a repository for interacting with  Redis, a service that handles the connection and transport, and a controller for the REST endpoint.
 
-The next piece is a [worker microservice](./part_3/worker) that retrieves the user data stored in Redis and writes the data to the MySQL database. The worker is a Plain Old Java Object, or POJO, that pulls the data from Redis using the blpop method. This method allows the worker to to pop data from the queue without constantly checking the status of the queue. Blpop works like a one time trigger that fires when data gets placed in the queue. Setting up the communication between the application and the worker establishes a reliable and fast queuing system.
+The next piece is a [worker microservice](./task_3/worker) that retrieves the user data stored in Redis and writes the data to the MySQL database. The worker is a Plain Old Java Object, or POJO, that pulls the data from Redis using the blpop method. This method allows the worker to to pop data from the queue without constantly checking the status of the queue. Blpop works like a one time trigger that fires when data gets placed in the queue. Setting up the communication between the application and the worker establishes a reliable and fast queuing system.
 
-We're adding three new components to the application - a Redis instance, the messageservice and the worker that writes to the database. There are Dockerfiles for both the [messageservice](./part_3/messageservice/Dockerfile) and the [worker](./part_3/worker/Dockerfile) to build them as images. Since Spring Boot includes Tomcat and the worker is just a jar file, we can build and deploy both components in a Java container.
+We're adding three new components to the application - a Redis instance, the messageservice and the worker that writes to the database. There are Dockerfiles for both the [messageservice](./task_3/messageservice/Dockerfile) and the [worker](./task_3/worker/Dockerfile) to build them as images. Since Spring Boot includes Tomcat and the worker is just a jar file, we can build and deploy both components in a Java container.
 
 ![microservice architecture](./images/microservice_arch.jpg)
 
@@ -542,15 +542,15 @@ We're adding three new components to the application - a Redis instance, the mes
 1. Build the message service that writes to Redis.
 
 ```bash
-$ cd ./part_3/messageservice
-$ docker image build $DTR_HOST/backend/messageservice .
+$ cd ./task_3/messageservice
+$ docker image build -t $DTR_HOST/backend/messageservice .
 ```
 
 2. Build the worker service that reads from writes to MySQL.
 
 ```bash
-$ cd ../part_3/worker
-$ docker image build $DTR_HOST/backend/messageservice .
+$ cd ../task_3/worker
+$ docker image build -t $DTR_HOST/backend/worker .
 ```
 
 3. One last thing, we'll need to modify the code in the original application to send the user data from the form to messageservice instead of writing it to the database directly. The main change in the code is that the data is posted to the messageservice instead of MySQL.
@@ -558,7 +558,7 @@ $ docker image build $DTR_HOST/backend/messageservice .
 Build the Java application and tag it with version 2.
 
 ```bash
-$ cd ./part3/java_app
+$ cd ./part3/java_app_v2
 $ docker image build -t $DTR_HOST/backend/java_web:2 .
 ```
 
@@ -600,7 +600,9 @@ services:
 
   database:
     image: <$DTR_HOST>/backend/database
-    enviro
+    environment:
+      MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
+    ports:
       - "3306:3306"
     networks:
       - back-tier
@@ -645,9 +647,7 @@ networks:
 
 secrets:
   mysql_root_password:
-    external: truenment:
-      MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
-    ports:
+    external: true
 ```
 
 ## <a name="task4"></a>Task 4: Adding Logging and Monitoring
