@@ -3,17 +3,17 @@
 repo_path="$(dirname `pwd`)"
 
 # build tutorial images
-cd $repo_path/task_2/java_app 
+cd $repo_path/task_2/java_app
 docker image build -t $DTR_HOST/frontend/java_web:1 .
 
-cd $repo_path/task_3/java_app 
+cd $repo_path/task_3/java_app
 docker image build -t $DTR_HOST/frontend/java_web:2 .
 
 cd $repo_path/task_2/database
-docker image build -t $DTR_HOST/backend/database .
+docker image build -t $DTR_HOST/backend/database:1 .
 
 cd $repo_path/task_3/messageservice
-docker image build -t $DTR_HOST/backend/messageservice .
+docker image build -t $DTR_HOST/backend/messageservice:1 .
 
 
 cd $repo_path/task_3/worker

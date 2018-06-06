@@ -307,7 +307,7 @@ ENV MYSQL_PASSWORD=password
 2. Use `docker build` to build your Docker image.
 
 	```bash
-	$ docker build -t $DTR_HOST/frontend/java_web .
+	$ docker build -t $DTR_HOST/frontend/java_web:1 .
 	```
 
 	The `-t` tags the image with a name. In our case, the name indicates which DTR server and under which organization's repository the image will live.
@@ -330,13 +330,13 @@ ENV MYSQL_PASSWORD=password
 	Use `docker push` to upload your image up to Docker Trusted Registry.
 
 	```bash
-	$ docker push $DTR_HOST/frontend/java_web
+	$ docker push $DTR_HOST/frontend/java_web:1
 	```
 
 	> TODO: add output of failure to push
 
 	```bash
-	$ docker push $DTR_HOST/frontend/java_web
+	$ docker push $DTR_HOST/frontend/java_web:1
 	The push refers to a repository [.<dtr hostname>/frontend/java_web]
 	8cb6044fd4d7: Preparing
 	07344436fe27: Preparing
@@ -350,7 +350,7 @@ ENV MYSQL_PASSWORD=password
 4. Now try logging in using `frontend_user`, and then use `docker push` to upload your image up to Docker Trusted Registry.
 
 	```bash
-	$ docker push $DTR_HOST/frontend/java_web
+	$ docker push $DTR_HOST/frontend/java_web:1
 	```
 
 	The output should be similar to the following:
@@ -384,12 +384,12 @@ ENV MYSQL_PASSWORD=password
 8. Use `docker build` to build your Docker image.
 
 	```bash
-	$ docker build -t $DTR_HOST/backend/database .
+	$ docker build -t $DTR_HOST/backend/database:1 .
 	```
 
 9. Login in as `backend_user` and use `docker push` to upload your image up to Docker Trusted Registry.
 	```bash
-	$ docker push $DTR_HOST/backend/database
+	$ docker push $DTR_HOST/backend/database:1
 	```
 
 10. In your web browser head back to your DTR server and click `View Details` next to your `database` repo to see the details of the repo.
@@ -411,7 +411,7 @@ We'll go through the Compose [file](./task_2/docker-compose.yml)
     services:
 
       database:
-        image: <$DTR_HOST>/backend/database
+        image: <$DTR_HOST>/backend/database:1
         # set default mysql root password, change as needed
         environment:
           MYSQL_ROOT_PASSWORD: mysql_password
@@ -426,7 +426,7 @@ In the section above, We pull the database container from DTR. We can also pass 
 
 ```yaml
       webserver:
-        image: <$DTR_HOST>/frontend/java_web
+        image: <$DTR_HOST>/frontend/java_web:1
         ports:
           - "8080:8080"
         networks:
@@ -480,7 +480,7 @@ version: "3.3"
 services:
 
   database:
-    image: <$DTR_HOST>/backend/database
+    image: <$DTR_HOST>/backend/database:1
     # set default mysql root password, change as needed
     environment:
       MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
@@ -543,14 +543,14 @@ We're adding three new components to the application - a Redis instance, the mes
 
 ```bash
 $ cd ./task_3/messageservice
-$ docker image build -t $DTR_HOST/backend/messageservice .
+$ docker image build -t $DTR_HOST/backend/messageservice:1 .
 ```
 
 2. Build the worker service that reads from writes to MySQL.
 
 ```bash
 $ cd ../task_3/worker
-$ docker image build -t $DTR_HOST/backend/worker .
+$ docker image build -t $DTR_HOST/backend/worker:1 .
 ```
 
 3. One last thing, we'll need to modify the code in the original application to send the user data from the form to messageservice instead of writing it to the database directly. The main change in the code is that the data is posted to the messageservice instead of MySQL.
@@ -572,8 +572,8 @@ $ docker image build -t $DTR_HOST/backend/java_web:2 .
 	Password: <your password>
 	Login Succeeded
 
-	$ docker push $DTR_HOST/backend/messageservice
-    $ docker push $DTR_HOST/backend/worker
+	$ docker push $DTR_HOST/backend/messageservice:1
+	$ docker push $DTR_HOST/backend/worker:1
 ```
 
 2. Login as frontend to DTR and push the java_web:2 image.
@@ -599,7 +599,7 @@ version: "3.3"
 services:
 
   database:
-    image: <$DTR_HOST>/backend/database
+    image: <$DTR_HOST>/backend/database:1
     environment:
       MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
     ports:
@@ -610,7 +610,7 @@ services:
       - mysql_root_password
 
   webserver:
-    image: <$DTR_HOST>/backend/java_web:2
+    image: <$DTR_HOST>/frontend/java_web:2
     ports:
       - "8080:8080"
     environment:
@@ -620,14 +620,14 @@ services:
       - back-tier
 
   messageservice:
-    image: <$DTR_HOST>/backend/messageservice
+    image: <$DTR_HOST>/backend/messageservice:1
     ports:
       - "8090:8090"
     networks:
       - back-tier
 
   worker:
-    image: <$DTR_HOST>/backend/worker
+    image: <$DTR_HOST>/backend/worker:1
     networks:
       - back-tier
 
@@ -699,7 +699,7 @@ version: "3.3"
 services:
 
   database:
-    image: <$DTR_HOST>/backend/database
+    image: <$DTR_HOST>/backend/database:1
     environment:
       MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
     ports:
@@ -720,7 +720,7 @@ services:
       - back-tier
 
   messageservice:
-    image: <$DTR_HOST>/backend/messageservice
+    image: <$DTR_HOST>/backend/messageservice:1
     ports:
       - "8090:8090"
     networks:
@@ -936,7 +936,7 @@ version: "3.3"
 services:
 
   database:
-    image: <$DTR_HOST>/backend/database
+    image: <$DTR_HOST>/backend/database:1
     deploy:
       placement:
         constraints: [node.role == worker]
@@ -980,7 +980,7 @@ services:
       - back-tier
 
   messageservice:
-    image: <$DTR_HOST>/backend/messageservice
+    image: <$DTR_HOST>/backend/messageservice:1
     deploy:
       mode: replicated
       replicas: 1
