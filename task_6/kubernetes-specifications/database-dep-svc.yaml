@@ -25,7 +25,7 @@ spec:
       - env:
         - name: MYSQL_ROOT_PASSWORD
           value: password
-        image: <$DTR_HOST>/backend/database
+        image: <$DTR_HOST>/backend/database:1
         imagePullPolicy: IfNotPresent
         name: database
         ports:

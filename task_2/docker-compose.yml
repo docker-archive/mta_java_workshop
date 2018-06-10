@@ -3,7 +3,7 @@ version: "3.3"
 services:
 
   database:
-    image: <$DTR_HOST>/backend/database
+    image: <$DTR_HOST>/backend/database:1
     # set default mysql root password, change as needed
     environment:
       MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password

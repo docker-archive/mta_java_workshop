@@ -3,7 +3,7 @@ version: "3.3"
 services:
 
   database:
-    image: <$DTR_HOST>/backend/database
+    image: <$DTR_HOST>/backend/database:1
     deploy:
       placement:
         constraints: [node.role == worker]
@@ -47,7 +47,7 @@ services:
       - back-tier
 
   messageservice:
-    image: <$DTR_HOST>/backend/messageservice
+    image: <$DTR_HOST>/backend/messageservice:1
     deploy:
       mode: replicated
       replicas: 1

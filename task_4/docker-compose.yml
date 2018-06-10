@@ -3,7 +3,7 @@ version: "3.3"
 services:
 
   database:
-    image: <$DTR_HOST>/backend/database
+    image: <$DTR_HOST>/backend/database:1
     environment:
       MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
     ports:
@@ -24,7 +24,7 @@ services:
       - back-tier
 
   messageservice:
-    image: <$DTR_HOST>/backend/messageservice
+    image: <$DTR_HOST>/backend/messageservice:1
     ports:
       - "8090:8090"
     networks:
