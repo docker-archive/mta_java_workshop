@@ -690,6 +690,7 @@ To make the example more visually interesting, code to calculate the age of the 
 $ ./firefly_data.sh
 ```
 ### <a name=task4.2></a>Task 4.2: Display Data on Kibana
+NOTE: The PWD hosts need a change to their configuration to satisfy an ElasticSearch requirement, on each of your PWD workers run the following command: `sudo sysctl -w vm.max_map_count=262144` 
 
 Create a stack that includes the Elasticsearch and Kibanna
 
