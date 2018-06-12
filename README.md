@@ -559,7 +559,7 @@ Build the Java application and tag it with version 2.
 
 ```bash
 $ cd ./part3/java_app_v2
-$ docker image build -t $DTR_HOST/backend/java_web:2 .
+$ docker image build -t $DTR_HOST/frontend/java_web:2 .
 ```
 
 ## <a name="task3.2"></a>Task 3.2: Push to DTR
