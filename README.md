@@ -197,6 +197,12 @@ Now that we've completely configured our cluster, let's deploy a couple of web a
 
 ### <a name="task2.1"></a> Task 2.1: Clone the Repository
 
+> /!\\
+>
+>Please make sure to run all the actions below on a worker node from the Play with Docker lab and not your local computer to avoid configuration/network issues.
+>
+> /!\
+
 1. From PWD click on the `worker1` link on the left to connect your web console to the UCP Linux worker node.
 
 2. Before we do anything, let's configure an environment variable for the DTR URL/DTR hostname. You may remember that the session information from the Play with Docker landing page. Select and copy the the URL for the DTR hostname.
