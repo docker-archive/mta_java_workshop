@@ -193,6 +193,12 @@ Now that we've completely configured our cluster, let's deploy a couple of web a
 
 ### <a name="task2.1"></a> Task 2.1: Clone the Repository
 
+> /!\\
+>
+>Please make sure to run all the actions below on a worker node from the Play with Docker lab and not your local computer to avoid configuration/network issues.
+>
+> /!\
+
 1. From PWD click on the `worker1` link on the left to connect your web console to the UCP Linux worker node.
 
 2. Before we do anything, let's configure an environment variable for the DTR URL/DTR hostname. You may remember that the session information from the Play with Docker landing page. Select and copy the the URL for the DTR hostname.
@@ -686,6 +692,7 @@ To make the example more visually interesting, code to calculate the age of the 
 $ ./firefly_data.sh
 ```
 ### <a name=task4.2></a>Task 4.2: Display Data on Kibana
+NOTE: The PWD hosts need a change to their configuration to satisfy an ElasticSearch requirement, on each of your PWD workers run the following command: `sudo sysctl -w vm.max_map_count=262144` 
 
 Create a stack that includes the Elasticsearch and Kibanna
 
