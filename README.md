@@ -176,17 +176,13 @@ However, before we create the repositories, we do want to restrict access to the
 
 	![](./images/add_java_web_to_team.png)
 
-12. Now add a new repository also owned by the web team and call it `signup_client`. This can be done directly from the web team's `Repositories` tab by selecting the radio button for Add `New` Repository. Be sure to grant `Read/Write` permissions for this repository to the `web` team as well.
+12. Repeat steps 6-11 above to create repositories called `database`, `messageservice` and `worker` under the `backend` organization. Create a team named `services` (with `backend_user` as a member). Grant `read/write` permissions for the `database`,`messageservice` and `worker` repositories to the `services` team.
 
-	![](./images/add_repository_signup_client.png)
-
-13. Repeat steps 6-11 above to create repositories called `database`, `messageservice` and `worker` under the `backend` organization. Create a team named `services` (with `backend_user` as a member). Grant `read/write` permissions for the `database`,`messageservice` and `worker` repositories to the `services` team.
-
-14. From the main DTR page, click Repositories, you will now see all three repositories listed.
+13. From the main DTR page, click Repositories, you will now see all three repositories listed.
 
 	![](./images/five_repositories.png)
 
-15. (optional) If you want to check out security scanning in Task 5, you should turn on scanning now so DTR downloads the database of security vulnerabilities. In the left-hand panel, select `System` and then the `Security` tab. Select `ENABLE SCANNING` and `Online`.
+14. (optional) If you want to check out security scanning in Task 5, you should turn on scanning now so DTR downloads the database of security vulnerabilities. In the left-hand panel, select `System` and then the `Security` tab. Select `ENABLE SCANNING` and `Online`.
 
 	![](./images/scanning-activate.png)
 
