@@ -176,17 +176,13 @@ However, before we create the repositories, we do want to restrict access to the
 
 	![](./images/add_java_web_to_team.png)
 
-12. Now add a new repository also owned by the web team and call it `signup_client`. This can be done directly from the web team's `Repositories` tab by selecting the radio button for Add `New` Repository. Be sure to grant `Read/Write` permissions for this repository to the `web` team as well.
+12. Repeat steps 6-11 above to create repositories called `database`, `messageservice` and `worker` under the `backend` organization. Create a team named `services` (with `backend_user` as a member). Grant `read/write` permissions for the `database`,`messageservice` and `worker` repositories to the `services` team.
 
-	![](./images/add_repository_signup_client.png)
-
-13. Repeat steps 6-11 above to create repositories called `database`, `messageservice` and `worker` under the `backend` organization. Create a team named `services` (with `backend_user` as a member). Grant `read/write` permissions for the `database`,`messageservice` and `worker` repositories to the `services` team.
-
-14. From the main DTR page, click Repositories, you will now see all three repositories listed.
+13. From the main DTR page, click Repositories, you will now see all three repositories listed.
 
 	![](./images/five_repositories.png)
 
-15. (optional) If you want to check out security scanning in Task 5, you should turn on scanning now so DTR downloads the database of security vulnerabilities. In the left-hand panel, select `System` and then the `Security` tab. Select `ENABLE SCANNING` and `Online`.
+14. (optional) If you want to check out security scanning in Task 5, you should turn on scanning now so DTR downloads the database of security vulnerabilities. In the left-hand panel, select `System` and then the `Security` tab. Select `ENABLE SCANNING` and `Online`.
 
 	![](./images/scanning-activate.png)
 
@@ -196,6 +192,12 @@ Congratulations, you have created five new repositories in two new organizations
 Now that we've completely configured our cluster, let's deploy a couple of web apps. The first app is a basic Java CRUD (Create Read Update Delete) application in Tomcat that writes to a MySQL database.
 
 ### <a name="task2.1"></a> Task 2.1: Clone the Repository
+
+> /!\\
+>
+>Please make sure to run all the actions below on a worker node from the Play with Docker lab and not your local computer to avoid configuration/network issues.
+>
+> /!\
 
 1. From PWD click on the `worker1` link on the left to connect your web console to the UCP Linux worker node.
 
@@ -559,7 +561,7 @@ Build the Java application and tag it with version 2.
 
 ```bash
 $ cd ./task_3/java_app_v2
-$ docker image build -t $DTR_HOST/backend/java_web:2 .
+$ docker image build -t $DTR_HOST/frontend/java_web:2 .
 ```
 
 ## <a name="task3.2"></a>Task 3.2: Push to DTR
@@ -690,6 +692,7 @@ To make the example more visually interesting, code to calculate the age of the 
 $ ./firefly_data.sh
 ```
 ### <a name=task4.2></a>Task 4.2: Display Data on Kibana
+NOTE: The PWD hosts need a change to their configuration to satisfy an ElasticSearch requirement, on each of your PWD workers run the following command: `sudo sysctl -w vm.max_map_count=262144` 
 
 Create a stack that includes the Elasticsearch and Kibanna
 
