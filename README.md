@@ -730,7 +730,7 @@ services:
       - back-tier
 
   worker:
-    image: <$DTR_HOST>/backend/worker:2
+    image: <$DTR_HOST>/backend/worker:1
     networks:
       - back-tier
 
