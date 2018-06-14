@@ -560,7 +560,7 @@ $ docker image build -t $DTR_HOST/backend/worker:1 .
 Build the Java application and tag it with version 2.
 
 ```bash
-$ cd ./part3/java_app_v2
+$ cd ./task_3/java_app_v2
 $ docker image build -t $DTR_HOST/frontend/java_web:2 .
 ```
 
