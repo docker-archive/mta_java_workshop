@@ -683,7 +683,7 @@ We're not making changes to the application or the registration microservice, so
     depends_on:
       - elasticsearch
 ```
-### <a name="task4.1"></a>Task 4.1: Add Data
+### <a name="task4.1"></a>Task 4.1: Build new worker image
 Adding these services won’t replace running containers if their definition matches the service in the Docker Compose file. Since the worker service has been updated Docker EE will run the containers for the Elasticsearch, Kibana. It will leave the other containers running as is,letting me add new features without taking the application offline.
 
 To make the example more visually interesting, code to calculate the age of the person based on their birthday was added to to the worker microservice so we will build a new version of the worker image, tagged worker:2 and deploy it to the cluster.
@@ -701,7 +701,7 @@ Login succeeded
 docker push $DTR_HOST/backend/worker:2
 ...
 ```
-### <a name=task4.2></a>Task 4.2: Display Data on Kibana
+### <a name=task4.2></a>Task 4.2: Deploy new stack and add test data
 NOTE: The PWD hosts need a change to their configuration to satisfy an ElasticSearch requirement, on each of your PWD workers run the following command: `sudo sysctl -w vm.max_map_count=262144` 
 
 Create a stack that includes the Elasticsearch and Kibanna
