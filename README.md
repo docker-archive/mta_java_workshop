@@ -686,10 +686,20 @@ We're not making changes to the application or the registration microservice, so
 ### <a name="task4.1"></a>Task 4.1: Add Data
 Adding these services won’t replace running containers if their definition matches the service in the Docker Compose file. Since the worker service has been updated Docker EE will run the containers for the Elasticsearch, Kibana. It will leave the other containers running as is,letting me add new features without taking the application offline.
 
-To make the example more visually interesting, code to calculate the age of the person based on their birthday was added to to the worker microservice and a new image, tagged worker:2, was deployed to the cluster. To test it out, there is a small shell script that posts user data to the messageservice that will populate the database. To run the script:
+To make the example more visually interesting, code to calculate the age of the person based on their birthday was added to to the worker microservice so we will build a new version of the worker image, tagged worker:2 and deploy it to the cluster.
 
+1. Build the image and push to DTR
 ```
-$ ./firefly_data.sh
+cd ../task_4
+docker build -t $DTR_HOST/backend/worker:2 .
+
+docker login $DTR_HOST
+Username: backend_user
+Password: user1234
+Login succeeded
+
+docker push $DTR_HOST/backend/worker:2
+...
 ```
 ### <a name=task4.2></a>Task 4.2: Display Data on Kibana
 NOTE: The PWD hosts need a change to their configuration to satisfy an ElasticSearch requirement, on each of your PWD workers run the following command: `sudo sysctl -w vm.max_map_count=262144` 
@@ -771,6 +781,12 @@ networks:
 secrets:
   mysql_root_password:
     external: true
+```
+
+To test it out, there is a small shell script that posts user data to the messageservice that will populate the database. To run the script (in the task_4 folder):
+
+```
+$ ./firefly_data.sh
 ```
 
 ### <a name=task4.3></a>Task 4.3: Display Data on Kibana
