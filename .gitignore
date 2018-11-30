@@ -4,3 +4,6 @@ spara*
 get_defs.sh
 target
 .idea
+.project
+.settings
+.classpath

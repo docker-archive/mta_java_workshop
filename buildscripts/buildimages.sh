@@ -6,7 +6,7 @@ repo_path="$(dirname `pwd`)"
 cd $repo_path/task_2/java_app
 docker image build -t $DTR_HOST/frontend/java_web:1 .
 
-cd $repo_path/task_3/java_app
+cd $repo_path/task_3/java_app_v2
 docker image build -t $DTR_HOST/frontend/java_web:2 .
 
 cd $repo_path/task_2/database

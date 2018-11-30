@@ -19,8 +19,9 @@ In this lab we'll use a Docker EE cluster. We'll initially deploy both a Java n-
 > * [Task 1: Configure the Docker EE Cluster](#task1)
 >   * [Task 1.1: Accessing PWD](#task1.1)
 >   * [Task 1.2: Docker Trusted Registry and Role Based Access Control](#task1.2)
+>   * [Task 1.3: Clone the MTA Repository and Finish Setting up DTR](#task1.3)
 > * [Task 2: Deploy a Java Web App with Universal Control Plane](#task2)
->   * [Task 2.1: Clone the Demo Repo](#task2.1)
+>   * [Task 2.1: Clone the Demo Repo Locally (optional)](#task2.1)
 >   * [Task 2.2: Building the Web App and Database Images](#task2.2)
 >   * [Task 2.3: Building and Pushing the Application to DTR](#task2.3)
 >   * [Task 2.4: Deploy the Web App using UCP](#task2.4)
@@ -176,13 +177,72 @@ However, before we create the repositories, we do want to restrict access to the
 
 	![](./images/add_java_web_to_team.png)
 
-12. Repeat steps 6-11 above to create repositories called `database`, `messageservice` and `worker` under the `backend` organization. Create a team named `services` (with `backend_user` as a member). Grant `read/write` permissions for the `database`,`messageservice` and `worker` repositories to the `services` team.
 
-13. From the main DTR page, click Repositories, you will now see all three repositories listed.
+### <a name="task1.3"></a>Task 1.3: Clone the MTA Repository and Finish Setting up DTR
+
+1. Clone this git repository onto a worker node which is required to run a script to complete the previous task steps 6-11 for all the other teams and repositories.
+
+> /!\\
+>
+>Please make sure to run all the actions below on a worker node from the Play with Docker lab and not your local computer to avoid configuration/network issues.
+>
+> /!\
+
+```bash
+$ git clone https://github.com/dockersamples/mta_java_workshop.git
+```
+
+You should see something like this as the output:
+
+```bash
+Cloning into 'mta_java_workshop'...
+remote: Counting objects: 389, done.
+remote: Compressing objects: 100% (17/17), done.
+remote: Total 389 (delta 4), reused 16 (delta 1), pack-reused 363
+Receiving objects: 100% (389/389), 13.74 MiB | 3.16 MiB/s, done.
+Resolving deltas: 100% (124/124), done.
+Checking connectivity... done.
+```
+
+ 2. Before the script to finish setting up your users and registries can be executed the environment must be configured with the DTR_HOST and UCP_HOST variables. You may remember that the session information from the Play with Docker landing page. Select and copy the the URL for the DTR hostname.
+
+	![](./images/session-information.png)
+
+Set an environment variable `DTR_HOST` using the DTR host name defined on your Play with Docker landing page:
+
+```bash
+$ export DTR_HOST=<DTR hostname>
+$ echo $DTR_HOST
+```
+
+and the UCP_HOSt:
+
+```bash
+$ export UCP_HOST=<UCP hostname>
+$ echo $UCP_HOST
+```
+
+3. Now, run the `task1.sh` script in the `mta_java_workshop/buildscripts/` directory:
+
+```bash
+$ cd ./mta_java_workshop/buildscripts && ./task1.sh
+```
+
+Alternatively, manually repeat steps 6-11 above to create repositories called `database`, `messageservice` and `worker` under the `backend` organization. Create a team named `services` (with `backend_user` as a member). Grant `read/write` permissions for the `database`,`messageservice` and `worker` repositories to the `services` team.
+
+4. From the main DTR page, click Repositories, you will now see all three repositories listed.
 
 	![](./images/five_repositories.png)
 
-14. (optional) If you want to check out security scanning in Task 5, you should turn on scanning now so DTR downloads the database of security vulnerabilities. In the left-hand panel, select `System` and then the `Security` tab. Select `ENABLE SCANNING` and `Online`.
+5. (optional)
+
+> /!\\
+>
+>Enabling security scanning requires significant bandwidth and CPU resources. Please enable only if instructed to by the instructor.
+>
+> /!\
+
+ If you want to check out security scanning in Task 5, you should turn on scanning now so DTR downloads the database of security vulnerabilities. In the left-hand panel, select `System` and then the `Security` tab. Select `ENABLE SCANNING` and `Online`.
 
 	![](./images/scanning-activate.png)
 
@@ -191,52 +251,7 @@ Congratulations, you have created five new repositories in two new organizations
 ## <a name="task2"></a>Task 2: Deploy a Java Web App with Universal Control Plane
 Now that we've completely configured our cluster, let's deploy a couple of web apps. The first app is a basic Java CRUD (Create Read Update Delete) application in Tomcat that writes to a MySQL database.
 
-### <a name="task2.1"></a> Task 2.1: Clone the Repository
-
-> /!\\
->
->Please make sure to run all the actions below on a worker node from the Play with Docker lab and not your local computer to avoid configuration/network issues.
->
-> /!\
-
-1. From PWD click on the `worker1` link on the left to connect your web console to the UCP Linux worker node.
-
-2. Before we do anything, let's configure an environment variable for the DTR URL/DTR hostname. You may remember that the session information from the Play with Docker landing page. Select and copy the the URL for the DTR hostname.
-
-	![](./images/session-information.png)
-
-3. Set an environment variable `DTR_HOST` using the DTR host name defined on your Play with Docker landing page:
-
-	```bash
-	$ export DTR_HOST=<DTR hostname>
-	$ echo $DTR_HOST
-	```
-4. Set an environment variable `UCP_HOST` using the DTR host name defined on your Play with Docker landing page:
-
-	```bash
-	$ export UCP_HOST=<UCP hostname>
-	$ echo $UCP_HOST
-	```
-
-5. Now use git to clone the workshop repository.
-
-	```bash
-	$ git clone https://github.com/dockersamples/mta_java_workshop.git
-	```
-
-	You should see something like this as the output:
-
-	```bash
-	Cloning into 'mta_java_workshop'...
-	remote: Counting objects: 389, done.
-	remote: Compressing objects: 100% (17/17), done.
-	remote: Total 389 (delta 4), reused 16 (delta 1), pack-reused 363
-	Receiving objects: 100% (389/389), 13.74 MiB | 3.16 MiB/s, done.
-	Resolving deltas: 100% (124/124), done.
-	Checking connectivity... done.
-	```
-
-	You now have the necessary code on your worker host.
+### <a name="task2.1"></a> Task 2.1: Clone the Repository Locally (optional)
 
 #### OPTIONAL
 
@@ -244,7 +259,7 @@ If you have git installed on your computer, cloning the repository to a local di
 
 ### <a name="task2.2"></a> Task 2.2: Building the Web App and Database Images
 
-As a first step, we'll containerize the application without changing existing code to test the concept of migrating the application to a container architecture. We'll do this by building the application from the source code and deploying it in the same application server used in production.  The code for containerizing the application can be found in the [task_2](./task_2) directory. Additionally, I'll configure and deploy the database.
+As a first step, we'll containerize the application without changing existing code to test the concept of migrating the application to a container architecture. We'll do this by building the application from the source code and deploying it in the same application server used in production.  The code for containerizing the application can be found in the [task_2](./task_2) directory. Additionally, we'll configure and deploy the database.
 
 Docker simplifies containerization with a Dockerfile, which is a text document that contains all the commands a user could call on the command line to assemble an image. Using `docker image build` users can create an automated build that executes several command-line instructions in succession.
 
@@ -334,8 +349,6 @@ ENV MYSQL_PASSWORD=password
 	```bash
 	$ docker push $DTR_HOST/frontend/java_web:1
 	```
-
-	> TODO: add output of failure to push
 
 	```bash
 	$ docker push $DTR_HOST/frontend/java_web:1
@@ -544,15 +557,14 @@ We're adding three new components to the application - a Redis instance, the mes
 1. Build the message service that writes to Redis.
 
 ```bash
-$ cd ./task_3/messageservice
-$ docker image build -t $DTR_HOST/backend/messageservice:1 .
+$ cd ./task_3
+$ docker image build -t $DTR_HOST/backend/messageservice:1 ./messageservice
 ```
 
 2. Build the worker service that reads from writes to MySQL.
 
 ```bash
-$ cd ../task_3/worker
-$ docker image build -t $DTR_HOST/backend/worker:1 .
+$ docker image build -t $DTR_HOST/backend/worker:1 ./worker
 ```
 
 3. One last thing, we'll need to modify the code in the original application to send the user data from the form to messageservice instead of writing it to the database directly. The main change in the code is that the data is posted to the messageservice instead of MySQL.
@@ -560,8 +572,7 @@ $ docker image build -t $DTR_HOST/backend/worker:1 .
 Build the Java application and tag it with version 2.
 
 ```bash
-$ cd ./task_3/java_app_v2
-$ docker image build -t $DTR_HOST/frontend/java_web:2 .
+$ docker image build -t $DTR_HOST/frontend/java_web:2 ./java_app_v2
 ```
 
 ## <a name="task3.2"></a>Task 3.2: Push to DTR
@@ -691,7 +702,7 @@ To make the example more visually interesting, code to calculate the age of the 
 1. Build the image and push to DTR
 ```
 cd ../task_4
-docker build -t $DTR_HOST/backend/worker:2 .
+docker build -t $DTR_HOST/backend/worker:2 ./worker
 
 docker login $DTR_HOST
 Username: backend_user
@@ -702,7 +713,33 @@ docker push $DTR_HOST/backend/worker:2
 ...
 ```
 ### <a name=task4.2></a>Task 4.2: Deploy new stack and add test data
-NOTE: The PWD hosts need a change to their configuration to satisfy an ElasticSearch requirement, on each of your PWD workers run the following command: `sudo sysctl -w vm.max_map_count=262144` 
+NOTE: The PWD hosts need a change to their configuration to satisfy an ElasticSearch requirement, each worker node must have this sysctl setting tuned: `sudo sysctl -w vm.max_map_count=262144` 
+
+Alternatively, you can run a script which will deploy a container that will set that setting on every node in your cluster:
+
+```bash
+$ ./set_sysctl.sh
+```
+
+You should see something similar to:
+
+```bash
+manager1
+521b21a49e6fbbc62c320ed6f1c82dd3d6e6491b6908af07cb2c2f36116b599f
+worker1
+8ac8ea4e2b00a2dea76344a8c1ce9aa8980d90928ccd8f7c421e5bdd44ead86c
+worker2
+8d8608d1214032fd1ec94ce75ae350790f28b411513b5abdf775067d2d7dbf95
+worker3
+ee04896a643e2485c84ee3223b4cfe728f7e50beb8afd19ca562960f25bf0f14
+```
+
+You can confirm the change by switching to any of the worker nodes and executing:
+
+```bash
+$ sysctl vm.max_map_count
+vm.max_map_count = 262144
+```
 
 Create a stack that includes the Elasticsearch and Kibanna
 
