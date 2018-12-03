@@ -1,7 +1,7 @@
 #
 # Build the app using maven in a container
 #
-FROM maven:latest AS devenv
+FROM maven:slim AS devenv
 WORKDIR /usr/src/signup 
 COPY app/pom.xml .
 RUN mvn -B -f pom.xml -s /usr/share/maven/ref/settings-docker.xml dependency:resolve
@@ -12,7 +12,7 @@ RUN mvn -B -s /usr/share/maven/ref/settings-docker.xml package -DskipTes
 # deploy application to tomcat
 #
 
-FROM tomcat:7-jre8
+FROM tomcat:7-jre8-slim
 LABEL maintainer="Sophia Parafina <sophia.parafina@docker.com>"
 
 # tomcat-users.xml sets up user accounts for the Tomcat manager GUI
