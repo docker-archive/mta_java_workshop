@@ -469,7 +469,7 @@ The next step is to run the app in Swarm. As a reminder, the application has two
 
 	![](./images/ucp_secret_menu.png)
 
-3. You'll see a `Create Secret` screen. Type `mysql_root_password` in `Name` and `Dockercon!!!` in `Content`. Then click `Create` in the lower left. Obviously you wouldn't use this password in a real production environment. You'll see the content box allows for quite a bit of content, you can actually create structured content here that will be encrypted with the secret.
+3. You'll see a `Create Secret` screen. Type `mysql_root_password` in `Name` and `Dockercon!!!` in `Content`. Then click `Create` in the lower right. Obviously you wouldn't use this password in a real production environment. You'll see the content box allows for quite a bit of content, you can actually create structured content here that will be encrypted with the secret.
 
 	![](./images/secret_add_config.png)
 
