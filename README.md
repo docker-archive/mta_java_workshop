@@ -528,7 +528,7 @@ secrets:
 
 Then click `Done` in the lower right.
 
-8. Click on `Stacks` again, and select the `java_web` stack. Click on `Inspect Resources` and then select `Services`. Select `java_web_webserver`. In the right panel, you'll see `Published Endpoints`. Select the one with `:8080` at the end. You'll see a `Apache Tomcat/7.0.84` landing page. Add `/java-web` to the end of the URL and you'll see the app.
+8. Click on `Stacks` again, and select the `java_web` stack. Select `Services`. Select `java_web_webserver`. In the right panel, you'll see `Endpoints`. Select the one with `:8080` at the end. You'll see a `Apache Tomcat/7.0.84` landing page. Add `/java-web` to the end of the URL and you'll see the app.
 
 	![](./images/java-web1.png)
 
@@ -557,7 +557,7 @@ We're adding three new components to the application - a Redis instance, the mes
 1. Build the message service that writes to Redis.
 
 ```bash
-$ cd ./task_3
+$ cd ../../task_3
 $ docker image build -t $DTR_HOST/backend/messageservice:1 ./messageservice
 ```
 
