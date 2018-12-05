@@ -318,7 +318,7 @@ ENV MYSQL_PASSWORD=password
 1. Change into the `java_app` directory.
 
 	```bash
-	$ cd ./task_2/java_app/
+	$ cd ../task_2/java_app/
 	```
 
 2. Use `docker build` to build your Docker image.
@@ -416,7 +416,7 @@ images
 
 ### <a name="task2.4"></a> Task 2.4: Deploy the Web App using UCP
 
-Docker automates the process of building and running the application from a single file using Docker Compse. Compose is a tool for declaratively  defining and running multi-container Docker applications. With Compose, a YAML file configures the application’s services. Then, with a single command, all the services are configured, created and started.
+Docker automates the process of building and running the application from a single file using Docker Compose. Compose is a tool for declaratively  defining and running multi-container Docker applications. With Compose, a YAML file configures the application’s services. Then, with a single command, all the services are configured, created and started.
 
 We'll go through the Compose [file](./task_2/docker-compose.yml)
 
@@ -469,7 +469,7 @@ The next step is to run the app in Swarm. As a reminder, the application has two
 
 	![](./images/ucp_secret_menu.png)
 
-3. You'll see a `Create Secret` screen. Type `mysql_root_password` in `Name` and `Dockercon!!!` in `Content`. Then click `Create` in the lower left. Obviously you wouldn't use this password in a real production environment. You'll see the content box allows for quite a bit of content, you can actually create structured content here that will be encrypted with the secret.
+3. You'll see a `Create Secret` screen. Type `mysql_root_password` in `Name` and `Dockercon!!!` in `Content`. Then click `Create` in the lower right. Obviously you wouldn't use this password in a real production environment. You'll see the content box allows for quite a bit of content, you can actually create structured content here that will be encrypted with the secret.
 
 	![](./images/secret_add_config.png)
 
@@ -528,7 +528,7 @@ secrets:
 
 Then click `Done` in the lower right.
 
-8. Click on `Stacks` again, and select the `java_web` stack. Click on `Inspect Resources` and then select `Services`. Select `java_web_webserver`. In the right panel, you'll see `Published Endpoints`. Select the one with `:8080` at the end. You'll see a `Apache Tomcat/7.0.84` landing page. Add `/java-web` to the end of the URL and you'll see the app.
+8. Click on `Stacks` again, and select the `java_web` stack. Select `Services`. Select `java_web_webserver`. In the right panel, you'll see `Endpoints`. Select the one with `:8080` at the end. You'll see a `Apache Tomcat/7.0.84` landing page. Add `/java-web` to the end of the URL and you'll see the app.
 
 	![](./images/java-web1.png)
 
@@ -557,7 +557,7 @@ We're adding three new components to the application - a Redis instance, the mes
 1. Build the message service that writes to Redis.
 
 ```bash
-$ cd ./task_3
+$ cd ../../task_3
 $ docker image build -t $DTR_HOST/backend/messageservice:1 ./messageservice
 ```
 
