@@ -714,6 +714,8 @@ docker push $DTR_HOST/backend/worker:2
 ```
 ### <a name=task4.2></a>Task 4.2: Deploy new stack and add test data
 
+NOTE: The PWD hosts need a change to their configuration to satisfy an ElasticSearch requirement, each node must have this sysctl setting tuned: `sudo sysctl -w vm.max_map_count=262144` 
+
 Create a stack that includes the Elasticsearch and Kibanna
 
 ```yaml
@@ -1118,42 +1120,10 @@ Kubernetes is an API and to connect to the API using the command line we will ne
 We can download the client bundle from UCP by requesting an authentication token.
 
 ```bash
-$ UCP_HOST=${1:<$UCP_HOST>}
-
-$ ADMIN_USER=${2:-admin}
-
-$ ADMIN_PASS=${3:-admin1234}
-
-$ PAYLOAD="{\"username\": \"$ADMIN_USER\", \"password\": \"$ADMIN_PASS\"}"
-
-$ echo $PAYLOAD
-{"username": "admin", "password": "admin1234"}
-
-$ TOKEN=$(curl --insecure  -d "$PAYLOAD" -X POST https://"$UCP_HOST"/auth/login  | jq -r ".auth_token")
-% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100   100  100    54  100    46    102     87 --:--:-- --:--:-- --:--:--   103
-
-$ echo $TOKEN
-211845cb-7751-4582-b880-f59252f61e18
-```
-
-Once we have a token, we can use it to get a client bundle and use it to configure the environment.
-
-```bash
-$ curl -k -H "Authorization: Bearer $TOKEN" https://"$UCP_HOST"/api/clientbundle > /tmp/bundle.zip
-
-$ mkdir /tmp/certs-$TOKEN
-
-$ pushd /tmp/certs-$TOKEN
-
-$ unzip /tmp/bundle.zip
-
-$ rm /tmp/bundle.zip
-
-$ source /tmp/certs-$TOKEN/env.sh
-
-$ popd
+$ cd ~/mta_java_workshop/buildscripts
+$ ./getbundle.sh
+$ cd bundle/
+$ source env.sh
 ```
 
 Test that the kubectl can connect to kubernetes.

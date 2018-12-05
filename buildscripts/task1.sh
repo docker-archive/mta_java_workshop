@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+
+set -e
+
+if [ -z "$DTR_HOST" ]; then
+  echo "ERROR - DTR_HOST ENV param is empty or unset"
+  exit 1
+fi
+
 DTR_HOST=${DTR_HOST:-$1}
 ADMIN_USER=${ADMIN_USER:-"admin"}
 ADMIN_PASSWORD=${ADMIN_PASSWORD:-"admin1234"}
