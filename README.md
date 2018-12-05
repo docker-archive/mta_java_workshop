@@ -318,7 +318,7 @@ ENV MYSQL_PASSWORD=password
 1. Change into the `java_app` directory.
 
 	```bash
-	$ cd ./task_2/java_app/
+	$ cd ../task_2/java_app/
 	```
 
 2. Use `docker build` to build your Docker image.
@@ -416,7 +416,7 @@ images
 
 ### <a name="task2.4"></a> Task 2.4: Deploy the Web App using UCP
 
-Docker automates the process of building and running the application from a single file using Docker Compse. Compose is a tool for declaratively  defining and running multi-container Docker applications. With Compose, a YAML file configures the application’s services. Then, with a single command, all the services are configured, created and started.
+Docker automates the process of building and running the application from a single file using Docker Compose. Compose is a tool for declaratively  defining and running multi-container Docker applications. With Compose, a YAML file configures the application’s services. Then, with a single command, all the services are configured, created and started.
 
 We'll go through the Compose [file](./task_2/docker-compose.yml)
 
