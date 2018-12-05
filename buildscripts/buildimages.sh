@@ -1,5 +1,12 @@
 #!/bin/bash
 
+set -e
+
+if [ -z "$DTR_HOST" ]; then
+  echo "ERROR - DTR_HOST ENV param is empty or unset"
+  exit 1
+fi
+
 repo_path="$(dirname `pwd`)"
 
 # build tutorial images

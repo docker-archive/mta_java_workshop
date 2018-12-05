@@ -1,4 +1,11 @@
 #!/bin/bash
+
+set -e
+
+if [ -z "$UCP_HOST" ]; then
+    echo "ERROR - UCP_HOST ENV param is empty or unset"
+    exit 1
+fi
 UCP_HOST=${UCP_HOST:-$1}
 
 ADMIN_USER=${2:-admin}
