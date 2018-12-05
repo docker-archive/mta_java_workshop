@@ -714,6 +714,8 @@ docker push $DTR_HOST/backend/worker:2
 ```
 ### <a name=task4.2></a>Task 4.2: Deploy new stack and add test data
 
+NOTE: The PWD hosts need a change to their configuration to satisfy an ElasticSearch requirement, each node must have this sysctl setting tuned: `sudo sysctl -w vm.max_map_count=262144` 
+
 Create a stack that includes the Elasticsearch and Kibanna
 
 ```yaml
