@@ -1121,7 +1121,9 @@ We can download the client bundle from UCP by requesting an authentication token
 
 ```bash
 $ cd ~/mta_java_workshop/buildscripts
-$ source getbundle.sh
+$ ./getbundle.sh
+$ cd bundle/
+$ source env.sh
 ```
 
 Test that the kubectl can connect to kubernetes.
