@@ -244,7 +244,7 @@ Alternatively, manually repeat steps 6-11 from the previous task above to create
 
  If you want to check out security scanning in Task 5, you should turn on scanning now so DTR downloads the database of security vulnerabilities. In the left-hand panel, select `System` and then the `Security` tab. Select `ENABLE SCANNING` and `Online`.
 
-	![](./images/scanning-activate.png)
+![](./images/scanning-activate.png)
 
 Congratulations, you have created five new repositories in two new organizations, each with one team and a user each.
 
