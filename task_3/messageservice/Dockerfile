@@ -1,4 +1,4 @@
-FROM maven:slim AS messageservice
+FROM maven:3.5.2-slim AS messageservice
 WORKDIR /usr/src/messageservice
 COPY pom.xml .
 RUN mvn -B -f pom.xml -s /usr/share/maven/ref/settings-docker.xml dependency:resolve
