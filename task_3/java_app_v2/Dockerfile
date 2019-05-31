@@ -1,7 +1,7 @@
 #
 # Build the app using maven in a container
 #
-FROM maven:slim AS devenv
+FROM maven:3.5.2-slim AS devenv
 WORKDIR /usr/src/signup 
 COPY app/pom.xml .
 RUN mvn -B -f pom.xml -s /usr/share/maven/ref/settings-docker.xml dependency:resolve
