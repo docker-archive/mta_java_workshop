@@ -2,6 +2,11 @@
 
 set -e
 
+# output colors
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+NORMAL=$(tput sgr0)
+
 if [ -z "$DTR_HOST" ]; then
   echo "ERROR - DTR_HOST ENV param is empty or unset"
   exit 1
@@ -10,9 +15,10 @@ fi
 DTR_HOST=${DTR_HOST:-$1}
 ADMIN_USER=${ADMIN_USER:-"admin"}
 ADMIN_PASSWORD=${ADMIN_PASSWORD:-"admin1234"}
+DEBUG=${4:-false}
 
 CURL_CMD="curl -k -s -u ${ADMIN_USER}:${ADMIN_PASSWORD} https://${DTR_HOST}"
-CURL_HEADER="Content-Type: application/json;charset=UTF-8"
+CURL_HEADERS=(-H 'Content-Type: application/json;charset=UTF-8' -H 'accept: application/json')
 
 post(){
   URI=$1
@@ -21,6 +27,9 @@ post(){
   fi
 
   RESPONSE=$(${CURL_CMD}${URI} -X POST ${DATA} -H "${CURL_HEADER}")
+  if [[ "$DEBUG" == "true" ]]||[[ $DEBUG == 1 ]]; then
+    echo $RESPONSE
+  fi
 }
 
 put(){
@@ -30,12 +39,15 @@ put(){
   fi
 
   RESPONSE=$(${CURL_CMD}${URI} -X PUT "${DATA}" -H "${CURL_HEADER}")
+  if [[ "$DEBUG" == "true" ]]||[[ $DEBUG == 1 ]]; then
+    echo $RESPONSE
+  fi
 }
 
 create_user(){
   USERNAME=$1
   PASSWORD=${2:-"user1234"}
-  echo Creating user $USERNAME
+  echo $GREEN "Creating user $USERNAME" $NORMAL
   post /enzi/v0/accounts '{"isAdmin":false,"isActive":true,"username":"'${USERNAME}'","password":"'${PASSWORD}'","fullName":"'${USERNAME}'","name":"'${USERNAME}'","type":"user"}'
 }
 
@@ -43,7 +55,7 @@ create_org(){
   ORG=$1
   USER=$2
   TEAM=$3
-  echo Creating org $ORG and $TEAM with user $USER
+  echo $GREEN "Creating org $ORG and $TEAM with user $USER" $NORMAL
   post /enzi/v0/accounts '{"name":"'${ORG}'","isOrg":true}'
   put /enzi/v0/accounts/${ORG}/members/admin '{"isAdmin":true,"isPublic":true}'
   put /enzi/v0/accounts/${ORG}/members/${USER} '{"isAdmin":false,"isPublic":true}'
@@ -55,7 +67,7 @@ create_repo(){
   REPO=$1
   ORG=$2
   TEAM=$3
-  echo Creating repo ${ORG}/${REPO} for team ${TEAM}
+  echo $GREEN "Creating repo ${ORG}/${REPO} for team ${TEAM}" $NORMAL
   post /api/v0/repositories/${ORG} "{\"name\":\"${REPO}\",\"visibility\":\"public\",\"shortDescription\":\"${REPO}\",\"scanOnPush\":false}"
   put /api/v0/repositories/${ORG}/${REPO}/teamAccess/${TEAM} '{"accessLevel":"read-write"}'
 }
