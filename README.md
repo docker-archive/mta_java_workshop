@@ -36,7 +36,7 @@ In this lab we'll use a Docker EE cluster. We'll initially deploy both a Java n-
 >   * [Task 5.1: Building the Javascript Client](#task5.1)
 >   * [Task 5.2: Deploying on a Running Cluster](#task5.2)
 > * [Task 6: Deploying on Kubernetes](#task6)
-> * [*Bonus* Task 7: Container log collection](#task-7:-container-log-collection)
+> * [*Bonus* Task 7: Container log collection](#task7)
 
 ## Understanding the Play With Docker Interface
 
@@ -1209,7 +1209,7 @@ Note that the port number is different from the common port 8080 used by Tomcat.
 
     ![](images/kubectl_get_deployments.png)
 
-## Task 7: Container log collection
+## <a name="task7"></a>Task 7: Container log collection
 
 Navigate to [Task 7 instructions](./task_7_logging/README.md) for more details.
 
