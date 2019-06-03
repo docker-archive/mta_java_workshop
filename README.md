@@ -1211,7 +1211,7 @@ Note that the port number is different from the common port 8080 used by Tomcat.
 
 ## <a name="task7"></a>Task 7: Container log collection
 
-Navigate to [Task 7 instructions](./task_7_logging/README.md) for more details.
+Navigate to [Task 7 instructions](./task_7_logging/readme.md) for more details.
 
 ## Conclusion
 
