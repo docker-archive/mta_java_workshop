@@ -35,7 +35,8 @@ In this lab we'll use a Docker EE cluster. We'll initially deploy both a Java n-
 > * [Task 5: Orchestration with Docker Swarm](#task5)
 >   * [Task 5.1: Building the Javascript Client](#task5.1)
 >   * [Task 5.2: Deploying on a Running Cluster](#task5.2)
-> * [Task 6: Deploying on Kubernetes](#task6)]
+> * [Task 6: Deploying on Kubernetes](#task6)
+> * [*Bonus* Task 7: Container log collection](#task-7:-container-log-collection)
 
 ## Understanding the Play With Docker Interface
 
@@ -1178,38 +1179,41 @@ Note that the port number is different from the common port 8080 used by Tomcat.
 
 2. View all info on deployment:
 
-```bash
-$ kubectl get all
-```
-![](images/kubectl_get_all.gif)
+    ```bash
+    $ kubectl get all
+    ```
+
+    ![](images/kubectl_get_all.gif)
 
 3. View info on pods
 
-```bash
-$ kubectl get pods
-```
-![](images/kubectl_get_pods.png)
+    ```bash
+    $ kubectl get pods
+    ```
+
+    ![](images/kubectl_get_pods.png)
 
 4. View info on services
 
-```bash
-$ kubectl get services
-```
+    ```bash
+    $ kubectl get services
+    ```
 
-![](images/kubectl_get_services.png)
+    ![](images/kubectl_get_services.png)
 
 5. View info on deployments
 
-```bash
-$ kubectl get deployments
-```
+    ```bash
+    $ kubectl get deployments
+    ```
 
-![](images/kubectl_get_deployments.png)
+    ![](images/kubectl_get_deployments.png)
 
+## Task 7: Container log collection
+
+Navigate to [Task 7 instructions](./task_7_logging/README.md) for more details.
 
 ## Conclusion
-
-
 
 ### What we covered
 

@@ -1,0 +1,44 @@
+version: "3.7"
+
+volumes:
+  journalbeat-data:
+    driver: local
+
+configs:
+  # journalbeat_config:
+  #   file: ./journalbeat/config/journalbeat.elasticsearch.yml
+  journalbeat_config:
+    file: ./journalbeat/config/journalbeat.logstash.yml
+
+networks:
+  back-tier:
+    external: true
+
+services:
+
+  journalbeat:
+    image: docker.elastic.co/beats/journalbeat-oss:7.1.1
+    # must run as a user (in this case root) that can read read system logs (i.e. docker logs) from journal
+    user: root
+    ports:
+      - "5044:5044"
+    volumes:
+      - /var/log/journal:/var/log/journal
+      - /etc/machine-id:/etc/machine-id:ro
+      - /etc/hostname:/etc/hostname:ro
+      - journalbeat-data:/data
+    configs:
+      - source: journalbeat_config
+        target: /usr/share/journalbeat/journalbeat.yml
+    networks: 
+      - back-tier
+    deploy:
+      mode: global
+      update_config:
+         parallelism: 1
+         delay: 10s
+      restart_policy:
+         condition: on-failure
+      placement:
+        constraints: 
+          - node.role == worker

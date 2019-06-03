@@ -1,0 +1,17 @@
+---
+## Default Logstash configuration from logstash-docker.
+## from https://github.com/elastic/logstash-docker/blob/master/build/logstash/config/logstash-full.yml
+#
+http.host: "0.0.0.0"
+
+# X-Pack settings
+## X-Pack is a licensed plugin. Logstash won't start with xpack settings defined and plugin not installed.
+
+# disable monitoring collection
+# xpack.monitoring.collection.enabled: false
+# xpack.monitoring.elasticsearch.hosts: [ "http://elasticsearch:9200" ]
+
+## X-Pack security credentials
+#
+# xpack.monitoring.elasticsearch.username: elastic
+# xpack.monitoring.elasticsearch.password: changeme

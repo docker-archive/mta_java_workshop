@@ -1,0 +1,118 @@
+version: "3.3"
+
+volumes:
+  logstash-sincedb:
+    driver: local
+
+networks:
+  front-tier:
+    external: true
+  back-tier:
+    external: true
+
+configs:
+  logstash_config:
+    file: ./logstash/config/logstash.yml
+  logstash_pipeline:
+    file: ./logstash/pipeline/logstash.conf
+  elastic_config:
+    file: ./elasticsearch/config/elasticsearch.yml
+  kibana_config:
+    file: ./kibana/config/kibana.yml
+
+services:
+
+#logging
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.1.1
+    command: elasticsearch -Enetwork.host=0.0.0.0 -Ediscovery.zen.ping.unicast.hosts=elasticsearch
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - /usr/share/elasticsearch/data
+    networks: 
+      - back-tier
+    configs:
+      - source: elastic_config
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints: [node.role == worker]      
+      resources:
+        limits:
+          cpus: '0.5'
+          # memory: 50M
+        # reservations:
+        #   cpus: '0.25'
+          # memory: 20M
+      update_config:
+        parallelism: 2
+        delay: 10s
+      # endpoint_mode: dnsrr
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:7.1.1
+    # environment:
+    #   ELASTICSEARCH_URL: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks: 
+      - back-tier
+      - front-tier
+    configs:
+      - source: kibana_config
+        target: /usr/share/kibana/config/kibana.yml
+    healthcheck:
+      test: curl http://localhost:5601 --fail --silent > /dev/null || exit 1
+      interval: 30s
+      retries: 3
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints: [node.role == worker]      
+      # resources:
+      #   limits:
+      #     cpus: '0.25'
+      #     memory: 100M
+      #   reservations:
+      #     memory: 50M
+      update_config:
+        parallelism: 2
+        delay: 10s
+    depends_on:
+      - elasticsearch
+
+  logstash:
+    # image: <$DTR_HOST>/backend/logstash:1
+    image: docker.elastic.co/logstash/logstash-oss:7.1.1
+    hostname: logstash
+    networks:
+      - back-tier
+    configs:
+      - source: logstash_config
+        target: /usr/share/logstash/config/logstash.yml
+      - source: logstash_pipeline
+        target: /usr/share/logstash/pipeline/logstash.conf
+    deploy:
+      mode: global
+      placement:
+        constraints: [node.role == worker]      
+    volumes:
+      - logstash-sincedb:/usr/share/logstash/data
+      - /var/lib/docker/volumes:/log/volumes

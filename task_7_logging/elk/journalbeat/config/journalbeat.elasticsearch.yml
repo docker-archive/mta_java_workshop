@@ -1,0 +1,107 @@
+###################### Journalbeat Configuration Example #########################
+
+# This file is an example configuration file highlighting only the most common
+# options. The journalbeat.reference.yml file from the same directory contains all the
+# supported options with more comments. You can use it as a reference.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/journalbeat/index.html
+
+# For more available modules and options, please see the journalbeat.reference.yml sample
+# configuration file.
+
+#=========================== Journalbeat inputs =============================
+
+journalbeat.inputs:
+  # Paths that should be crawled and fetched. Possible values files and directories.
+  # When setting a directory, all journals under it are merged.
+  # When empty starts to read from local journal.
+- paths: []
+# - paths: [
+#   "/var/log/journal"
+# ]
+
+  # Position to start reading from journal. Valid values: head, tail, cursor
+  seek: cursor
+  # Fallback position if no cursor data is available.
+  cursor_seek_fallback: tail
+
+  # Exact matching for field values of events.
+  # Matching for nginx entries: "systemd.unit=nginx"
+  # Matching for docker entries: "systemd.unit=docker.service"
+  include_matches: ["systemd.unit=docker.service"]
+
+#================================ General ======================================
+
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+# If this options is not defined, the hostname is used.
+#name:
+
+# The tags of the shipper are included in their own field with each
+# transaction published. Tags make it easy to group servers by different
+# logical properties.
+#tags: ["service-X", "web-tier"]
+tags: ["docker-logs"]
+
+#================================ Outputs ======================================
+
+# Configure what output to use when sending the data collected by the beat.
+
+#-------------------------- Elasticsearch output -------------------------------
+output.elasticsearch:
+  # Boolean flag to enable or disable the output module.
+  enabled: true
+
+  # Array of hosts to connect to.
+  # Scheme and port can be left out and will be set to the default (http and 9200)
+  # In case you specify and additional path, the scheme is required: http://localhost:9200/path
+  # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
+  hosts: ["elk_elasticsearch:9200"]
+
+  # Optional index name. The default is "journalbeat" plus date
+  # and generates [journalbeat-]YYYY.MM.DD keys.
+  # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
+  #index: "journalbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+  index: "jb_es-%{[agent.version]}-%{+yyyy.MM.dd}"
+
+  # Use SSL settings for HTTPS.
+  ssl.enabled: false
+
+  # Configure SSL verification mode. If `none` is configured, all server hosts
+  # and certificates will be accepted. In this mode, SSL-based connections are
+  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
+  # `full`.
+  #ssl.verification_mode: full
+
+#============================== Template =====================================
+
+# A template is used to set the mapping in Elasticsearch
+# By default template loading is enabled and the template is loaded.
+# These settings can be adjusted to load your own template or overwrite existing ones.
+
+# Set to false to disable template loading.
+#setup.template.enabled: true
+
+# Template name. By default the template name is "journalbeat-%{[agent.version]}"
+# The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
+#setup.template.name: "journalbeat-%{[agent.version]}"
+setup.template.name: "jb_es-%{[agent.version]}"
+
+# Template pattern. By default the template pattern is "-%{[agent.version]}-*" to apply to the default index settings.
+# The first part is the version of the beat and then -* is used to match all daily indices.
+# The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
+#setup.template.pattern: "journalbeat-%{[agent.version]}-*"
+setup.template.pattern: "jb_es-%{[agent.version]}-*"
+
+#============================== Kibana =====================================
+
+# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
+# This requires a Kibana endpoint configuration.
+setup.kibana:
+
+  # Kibana Host
+  # Scheme and port can be left out and will be set to the default (http and 5601)
+  # In case you specify and additional path, the scheme is required: http://localhost:5601/path
+  # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
+  host: "elk_kibana:5601"
