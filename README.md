@@ -1216,6 +1216,8 @@ Navigate to [Task 7 instructions](./task_7_logging/readme.md) for more details.
 
 ## <a name="task8"></a>Task 8: Setting up CI/CD pipeline
 
+Navigate to [Task 8 instructions](./task_8_cicd/readme.md) for more details.
+
 ## Conclusion
 
 ### What we covered
