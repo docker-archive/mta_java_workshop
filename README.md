@@ -37,6 +37,7 @@ In this lab we'll use a Docker EE cluster. We'll initially deploy both a Java n-
 >   * [Task 5.2: Deploying on a Running Cluster](#task5.2)
 > * [Task 6: Deploying on Kubernetes](#task6)
 > * [*Bonus* Task 7: Container log collection](#task7)
+> * [*Bonus* Task 8: Setting up CI/CD pipeline](#task8)
 
 ## Understanding the Play With Docker Interface
 
@@ -937,7 +938,7 @@ The `resources` directive sets the `limits` on the memory and CPU available to t
 
 ### Placement
 
-Placement specifies constraints and preferences for a container. Constraints let you specify which nodes where a task can be scheduled. For example, you can specify that a container run only on a worker node, as in the example. Other contraints are:
+Placement specifies constraints and preferences for a container. Constraints let you specify which nodes where a task can be scheduled. For example, you can specify that a container run only on a worker node, as in the example. Other constraints are:
 
 |node | attribute matches | example|
 |-----|-------------------|--------|
@@ -1212,6 +1213,8 @@ Note that the port number is different from the common port 8080 used by Tomcat.
 ## <a name="task7"></a>Task 7: Container log collection
 
 Navigate to [Task 7 instructions](./task_7_logging/readme.md) for more details.
+
+## <a name="task8"></a>Task 8: Setting up CI/CD pipeline
 
 ## Conclusion
 

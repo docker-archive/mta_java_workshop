@@ -115,4 +115,4 @@ Feel free to choose either option or even try both.
 
         Open `Kibana` console `https://${UCP_HOST}:5601` and wait for index pattern `jb_ls-<version>-<date>` to appear. Then configure the index pattern and veiw logs in the dashboard.
 
-Note that container logs are written into host's `journald` logs by `journald` log driver configured in `daemon.json` and scraped by `Journalbeat` component. This approach aligns with Docker's recommendation to use either standard log drivers or `Docker API` to scrape container logs. It is a better way to collect contianer logs than scraping physical log files that can be found at `/var/lib/docker/containers/*/*-json.log` on each Docker host.
+Note that container logs are written into host's `journald` logs by `journald` log driver configured in `daemon.json` and scraped by `Journalbeat` component. This approach aligns with Docker's recommendation to use either standard log drivers or `Docker API` to scrape container logs. It is a better way to collect container logs than scraping physical log files that can be found at `/var/lib/docker/containers/*/*-json.log` on each Docker host.

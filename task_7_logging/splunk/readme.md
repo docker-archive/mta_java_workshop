@@ -1,3 +1,3 @@
-# Splunk logging solugion
+# Splunk logging solution
 
 *Under development*
