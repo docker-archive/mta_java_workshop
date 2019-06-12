@@ -26,7 +26,7 @@ post(){
     DATA="-d ${2}"
   fi
 
-  RESPONSE=$(${CURL_CMD}${URI} -X POST ${DATA} -H "${CURL_HEADER}")
+  RESPONSE=$(${CURL_CMD}${URI} -X POST ${DATA} "${CURL_HEADERS[@]}")
   if [[ "$DEBUG" == "true" ]]||[[ $DEBUG == 1 ]]; then
     echo $RESPONSE
   fi
@@ -38,7 +38,7 @@ put(){
     DATA="-d ${2}"
   fi
 
-  RESPONSE=$(${CURL_CMD}${URI} -X PUT "${DATA}" -H "${CURL_HEADER}")
+  RESPONSE=$(${CURL_CMD}${URI} -X PUT "${DATA}" "${CURL_HEADERS[@]}")
   if [[ "$DEBUG" == "true" ]]||[[ $DEBUG == 1 ]]; then
     echo $RESPONSE
   fi
