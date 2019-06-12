@@ -1,0 +1,73 @@
+version: "3.7"
+
+secrets:
+  gitlab_root_password:
+    file: ./config/root_password.txt
+
+volumes:
+  gitlab_config:
+    driver: local
+  gitlab_logs:
+    driver: local
+  gitlab_data:
+    driver: local
+  gitlab-runner_config:
+    driver: local
+
+services:
+
+  gitlab:
+    # image: gitlab/gitlab-ce:latest
+    image: store/gitlab/gitlab-ce:11.10.4-ce.0
+    environment:
+      # inline gitlab config example
+      GITLAB_OMNIBUS_CONFIG: "gitlab_rails['lfs_enabled'] = true; gitlab_rails['initial_root_password'] = 'MySuperSecretAndSecurePass0rd!';"
+      # inline gitlab config example with external URL
+      # GITLAB_OMNIBUS_CONFIG: "external_url 'https://localhost:9090'; gitlab_rails['lfs_enabled'] = true; gitlab_rails['initial_root_password'] = 'MySuperSecretAndSecurePass0rd!';"
+      # file gitlab config example
+      # GITLAB_OMNIBUS_CONFIG: "from_file('./config/omnibus_config.rb')"
+    hostname: gitlab.example.com
+    secrets:
+      - gitlab_root_password
+    ports:
+      - "9091:80"
+      - "1443:443"
+      - "2022:22"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - gitlab_config:/etc/gitlab
+      - gitlab_logs:/var/log/gitlab
+      - gitlab_data:/var/opt/gitlab
+    # restart: always
+    networks:
+      gitlab:
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        window: 120s
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:alpine-v11.11.2
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - gitlab-runner_config:/etc/gitlab-runner
+      # map machine paths with ~/.docker and ~/.notary
+      # these paths are necessary when working with Docker Content Trust
+      # - /root/.docker:/root/.docker
+      # - /root/.notary:/root/.notary
+    restart: always
+    networks:
+      gitlab:
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: always
+        delay: 5s
+        window: 120s
+
+networks:
+  gitlab:

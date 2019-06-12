@@ -1,0 +1,19 @@
+variables:
+  DOCKER_DRIVER: overlay2
+  DTR_USERNAME: admin
+  DTR_PASSWORD: password
+  DTR_SERVER: dtr.example.com
+  NAMESPACE: 'ci'
+
+image: docker:stable
+
+before_script:
+  - docker info
+  - docker login -u $DTR_USERNAME -p $DTR_PASSWORD $DTR_SERVER
+
+build:
+  stage: build
+  script:
+    - docker build --pull -t "$DTR_SERVER"/"${NAMESPACE}"/"$CI_PROJECT_NAME"_build:$CI_JOB_ID .
+    - docker push "$DTR_SERVER"/"${NAMESPACE}"/"$CI_PROJECT_NAME"_build:$CI_JOB_ID
+    - docker rmi "$DTR_SERVER"/"${NAMESPACE}"/"$CI_PROJECT_NAME"_build:$CI_JOB_ID

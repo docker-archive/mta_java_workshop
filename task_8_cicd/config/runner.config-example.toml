@@ -1,0 +1,50 @@
+concurrent = 1
+check_interval = 0
+
+[[runners]]
+  name = "shell runner"
+  url = "http://cicd_gitlab:80/"
+  clone_url = "http://ucp.example.com:9090"
+  token = ""
+  limit = 0
+  executor = "shell"
+  builds_dir = ""
+  shell = "bash"
+  environment = ["ENV=value", "LC_ALL=en_US.UTF-8"]
+  # [runners.cache]
+  # use for S3 cache
+  #   [runners.cache.s3]
+  # use for GCS cache
+  #   [runners.cache.gcs]
+
+# # example using docker-in-docker with docker socket
+# [[runners]]
+#   url = "http://cicd_gitlab:9090/"
+#   clone_url = "http://ucp.example.com:9090"
+#   name = "docker-n-docker"
+#   token = ""
+#   executor = "docker"
+#   [runners.docker]
+#     tls_verify = false
+#     image = "docker:stable"
+#     privileged = false
+#     disable_cache = false
+#     volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/cache"]
+#   [runners.cache]
+#     Insecure = false
+
+# # example using docker-in-docker with TCP connection to host's engine
+# [[runners]]
+#   url = "http://cicd_gitlab:9090/"
+#   clone_url = "http://ucp.example.com:9090"
+#   name = "docker-n-docker"
+#   token = ""
+#   executor = "docker"
+#   [runners.docker]
+#     tls_verify = false
+#     image = "docker:stable"
+#     privileged = true
+#     disable_cache = false
+#     volumes = ["/cache"]
+#   [runners.cache]
+#     Insecure = false
